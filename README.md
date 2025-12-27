@@ -2,7 +2,7 @@
 디스코드 질문 수집부터 AI 답변 생성, 그리고 노션 아카이빙까지 한 번에 관리하는 통합 학습 보조 시스템입니다.
 
 1. 프로젝트 개요
-수강생이 디스코드에서 질문을 던지면, Google Gemini 1.5 Flash 모델이 즉시 답변을 제공하고, 관리자(조교)가 장고 어드민에서 내용을 검수 및 수정한 뒤 버튼 하나로 노션 데이터베이스에 학습 로그를 저장합니다.
+수강생이 디스코드에서 질문을 던지면, Google Gemini 2.5 Flash 모델이 즉시 답변을 제공하고, 관리자(조교)가 장고 어드민에서 내용을 검수 및 수정한 뒤 버튼 하나로 노션 데이터베이스에 학습 로그를 저장합니다.
 
 2. 주요 기능
 Discord Bot: 실시간 질문 감지 및 AI 자동 답변 응답.
@@ -29,7 +29,7 @@ Language: Python 3.x
 
 Framework: Django (Admin)
 
-AI: Google Generative AI (Gemini 1.5 Flash)
+AI: Google Generative AI (Gemini 2.5 Flash)
 
 API: Discord API (discord.py), Notion API
 
@@ -57,7 +57,8 @@ source venv/bin/activate  # Mac
 
 Bash
 
-pip install -r requirements.txt
+uv init
+uv sync
 데이터베이스 마이그레이션 및 서버 실행
 
 Bash
@@ -70,3 +71,4 @@ python manage.py runserver
 에러 핸들링: 노션 API 글자 수 제한(2,000자) 및 특수 문자 세척 기능 추가.
 
 로깅 시스템: 전송 실패 시 상세 에러 원인(Property 일치 여부 등)을 터미널에 출력하도록 개선.
+
