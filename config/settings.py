@@ -25,7 +25,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'archiver'
+    'archiver',
+    'import_export',
+
 ]
 
 MIDDLEWARE = [
@@ -63,8 +65,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "bot_db",
+        "USER": "bot_user",
+        "PASSWORD": "Murter!679",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 

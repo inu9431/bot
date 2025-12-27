@@ -6,6 +6,8 @@ class QnALog(models.Model):
     question_text = models.TextField() # 학생 질문
     image = models.ImageField(upload_to='qna_images/', null=True, blank=True)
     ai_answer = models.TextField() # AI가 정리한 답변
+
+    is_verified = models.BooleanField(default=False, verbose_name="검증 완료")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
