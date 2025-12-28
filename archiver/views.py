@@ -1,28 +1,36 @@
-from django.shortcuts import render
+from tkinter import image_names
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import QnALog
 from .services import analyze_qna
+from core.exceptions import EmptyAiAnswerError
 
-def upload_qna(request):
-    if request.method == 'POST':
-        question_text = request.POST.get('question_text')
+class QnABotAPIView(APIView):
+    def post(self, request):
+        question_text = request.data.get('question_text')
         image = request.FILES.get('image')
 
-        # 우선 임시 저장(이미지 경로 확보)
-        log = QnALog.objects.create(question_text=question_text, image=image)
+        # 데이터 기록
+        log = QnALog.objects.create(
+            question_text = question_text,
+            image = image,
+            title = f"검토 대기 중인 질문"
+        )
 
-        #  AI 분석 실행
-        image_path = log.image.path if log.image else None
+        # AI 분석 실행
+        image_path = QnALog.image.path if QnALog.image else None
         ai_result = analyze_qna(question_text, image_path)
 
-        # AI 결과 업데이트
-        log.ai_answer = ai_result
-        log.title = f"Q&A - {log.id}번 사례"
-        log.save()
+        if not ai_result:
+            raise EmptyAiAnswerError()
 
-        return render(request, 'archiver/upload_qna.html', {'log': log})
+        # 결과 업데이트
+        QnALog.ai_answer = ai_result
+        QnALog.save()
 
-    return render(request, 'archiver/upload_qna.html')
-
-def index(request):
-    logs = QnALog.objects.all().order_by('-created_at')
-    return render(request, 'archiver/index.html', {'logs': logs})
+        return Response({
+            "status" : "success",
+            "Log_id" : QnALog.id,
+        "ai_answer" : ai_result
+        })
