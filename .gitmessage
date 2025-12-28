@@ -1,6 +1,6 @@
-# ✨ :sparkles: (feat): 새로운 기능 추가
-# 🐛 :bug: (fix): 버그 수정 (로직 오류 등)
-# 🎨 :art: (style): 코드 포맷팅 (Lint, Formatter 적용)
-# ♻️ :recycle: (refactor): 코드 리팩토링 (가독성 개선 등)
-# 📝 :memo: (docs): 문서 수정 (README 등)
-# ✅ :white_check_mark: (test): 테스트 코드 추가/수정
+# ✨ (feat): 새로운 기능 추가
+# 🐛 (fix): 버그 수정
+# 🎨 (style): 코드 포맷팅
+# ♻️ (refactor): 코드 리팩토링
+# 📝 (docs): 문서 수정
+# ✅ (test): 테스트 코드 추가/수정
