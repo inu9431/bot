@@ -1,7 +1,56 @@
+import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 로그를 저장할 디렉토리
+LOG_BASE_DIR = Path(BASE_DIR) / "Logs"
+
+if not LOG_BASE_DIR.exists():
+    LOG_BASE_DIR.mkdir()
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        # 콘솔(터미널)에 출력
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        # 파일에 저장 (5MB 넘으면 새로 만들고 최대 5개 유지)
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOG_BASE_DIR / 'django.log',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        # 우리 앱 전용 로거
+        'apps': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,6 +76,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'archiver',
     'import_export',
+    'rest_framework',
 
 ]
 
@@ -38,6 +88,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middlewares.CustomExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
