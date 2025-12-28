@@ -1,0 +1,122 @@
+[INFO] 2025-12-28 12:44:38,647 autoreload Watching for file changes with StatReloader
+[ERROR] 2025-12-28 12:44:44,224 middlewares Unhandled Exception: Directory indexes are not allowed here.
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/static.py", line 49, in serve
+    raise Http404(_("Directory indexes are not allowed here."))
+django.http.response.Http404: Directory indexes are not allowed here.
+[ERROR] 2025-12-28 12:44:44,242 log Internal Server Error: /
+[ERROR] 2025-12-28 12:44:44,244 log "GET / HTTP/1.1" 500 116
+[ERROR] 2025-12-28 12:44:44,582 middlewares Unhandled Exception: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” does not exist
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/static.py", line 51, in serve
+    raise Http404(_("“%(path)s” does not exist") % {"path": fullpath})
+django.http.response.Http404: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” does not exist
+[ERROR] 2025-12-28 12:44:44,593 log Internal Server Error: /favicon.ico
+[ERROR] 2025-12-28 12:44:44,594 log "GET /favicon.ico HTTP/1.1" 500 116
+[INFO] 2025-12-28 12:44:47,021 log "GET /admin/archiver/qnalog/14/change/ HTTP/1.1" 200 12717
+[ERROR] 2025-12-28 12:44:47,447 middlewares Unhandled Exception: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” does not exist
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/static.py", line 51, in serve
+    raise Http404(_("“%(path)s” does not exist") % {"path": fullpath})
+django.http.response.Http404: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” does not exist
+[ERROR] 2025-12-28 12:44:47,455 log Internal Server Error: /favicon.ico
+[ERROR] 2025-12-28 12:44:47,455 log "GET /favicon.ico HTTP/1.1" 500 116
+[ERROR] 2025-12-28 12:45:12,451 middlewares Unhandled Exception: Directory indexes are not allowed here.
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/static.py", line 49, in serve
+    raise Http404(_("Directory indexes are not allowed here."))
+django.http.response.Http404: Directory indexes are not allowed here.
+[ERROR] 2025-12-28 12:45:12,459 log Internal Server Error: /
+[ERROR] 2025-12-28 12:45:12,459 log "GET / HTTP/1.1" 500 116
+[ERROR] 2025-12-28 12:45:12,485 middlewares Unhandled Exception: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” does not exist
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/static.py", line 51, in serve
+    raise Http404(_("“%(path)s” does not exist") % {"path": fullpath})
+django.http.response.Http404: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” does not exist
+[ERROR] 2025-12-28 12:45:12,492 log Internal Server Error: /favicon.ico
+[ERROR] 2025-12-28 12:45:12,493 log "GET /favicon.ico HTTP/1.1" 500 116
+[INFO] 2025-12-28 12:46:34,623 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/urls.py changed, reloading.
+[INFO] 2025-12-28 12:46:48,823 autoreload Watching for file changes with StatReloader
+[WARNING] 2025-12-28 12:46:57,108 log Not Found: /
+[WARNING] 2025-12-28 12:46:57,109 log "GET / HTTP/1.1" 404 2652
+[WARNING] 2025-12-28 12:46:57,168 log Not Found: /favicon.ico
+[WARNING] 2025-12-28 12:46:57,168 log "GET /favicon.ico HTTP/1.1" 404 2727
+[WARNING] 2025-12-28 12:47:05,095 log Not Found: /archiver
+[WARNING] 2025-12-28 12:47:05,095 log "GET /archiver HTTP/1.1" 404 2694
+[INFO] 2025-12-28 12:48:43,048 log "GET /admin/ HTTP/1.1" 200 10660
+[INFO] 2025-12-28 12:48:43,071 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,072 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,072 log "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,074 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,074 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,075 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,096 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,132 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:43,132 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,107 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 23780
+[INFO] 2025-12-28 12:48:45,123 log "GET /static/admin/css/forms.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,125 log "GET /static/admin/js/core.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,125 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,126 log "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,137 log "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,137 log "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,137 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,145 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,153 log "GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,159 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 12:48:45,172 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,183 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,189 log "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,239 log "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,240 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:45,241 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:50,415 log "GET /admin/archiver/qnalog/17/change/ HTTP/1.1" 200 13415
+[INFO] 2025-12-28 12:48:50,435 log "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:50,436 log "GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:48:50,460 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 12:49:19,064 log "POST /admin/archiver/qnalog/17/change/ HTTP/1.1" 302 0
+[INFO] 2025-12-28 12:49:19,103 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 24100
+[INFO] 2025-12-28 12:49:19,184 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 12:49:19,243 log "GET /static/admin/img/icon-yes-dark.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:49:19,244 log "GET /static/admin/img/icon-info-dark.svg HTTP/1.1" 304 0
+[INFO] 2025-12-28 12:50:39,063 log "GET /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 14345
+[INFO] 2025-12-28 12:50:39,104 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 12:50:51,166 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 12961
+[INFO] 2025-12-28 12:50:51,208 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 12:56:37,310 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2025-12-28 12:56:53,174 autoreload Watching for file changes with StatReloader
+[INFO] 2025-12-28 12:58:14,241 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2025-12-28 12:58:20,289 autoreload Watching for file changes with StatReloader
+[INFO] 2025-12-28 13:00:36,749 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2025-12-28 13:00:50,024 autoreload Watching for file changes with StatReloader
+[INFO] 2025-12-28 13:01:00,661 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 12961
+[INFO] 2025-12-28 13:01:00,710 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:01:02,942 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 23758
+[INFO] 2025-12-28 13:01:02,989 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:01:05,843 log "GET /admin/archiver/qnalog/17/change/ HTTP/1.1" 200 12812
+[INFO] 2025-12-28 13:01:05,894 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:01:10,729 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 23758
+[INFO] 2025-12-28 13:01:11,786 log "GET /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 14345
+[INFO] 2025-12-28 13:01:11,823 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:01:16,340 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 13069
+[INFO] 2025-12-28 13:01:16,383 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:01:44,681 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 13069
+[INFO] 2025-12-28 13:01:44,721 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:04:11,550 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2025-12-28 13:04:27,332 autoreload Watching for file changes with StatReloader
+[INFO] 2025-12-28 13:04:31,903 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 200 13069
+[INFO] 2025-12-28 13:04:31,950 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2025-12-28 13:08:37,032 admin [NOTION SUCCESS] ID: 18 전송 완료
+[INFO] 2025-12-28 13:08:37,053 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 302 0
+[INFO] 2025-12-28 13:08:37,304 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 24134
+[INFO] 2025-12-28 13:08:37,395 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
