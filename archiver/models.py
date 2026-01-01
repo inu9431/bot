@@ -8,8 +8,13 @@ class QnALog(models.Model):
     ai_answer = models.TextField() # AI가 정리한 답변
 
     is_verified = models.BooleanField(default=False, verbose_name="검증 완료")
+    hit_count = models.PositiveIntegerField(default=1, verbose_name="질문 빈도")
+    parent_question = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_questions')
+    notion_page_url = models.URLField(max_length=500, null=True, blank=True, verbose_name="노션 페이지 링크")
+
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return f"[{self.hit_count}] {self.title}"
 
