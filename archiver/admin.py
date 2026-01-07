@@ -11,18 +11,18 @@ logger = logging.getLogger('apps')
 class QnALogAdmin(ExportActionMixin, admin.ModelAdmin):
     # 1. 목록 화면 설정
     # 질문 빈도(hit_count)를 가장 앞에 나오게 함
-    list_display = ('hit_count', 'title','is_verified', 'category', 'created_at')
-
+    list_display = ('id', 'hit_count', 'title','is_verified', 'category', 'created_at')
+    list_display_links = ('id', 'title',)
     # 2. 리스트에서 바로 수정
     # 상세 페이지에 들어가지 않고 체크박스 하나로 노션 전송을 결정
-    list_editable = ('is_verified',)
+    list_editable = ('is_verified', 'category')
 
     # 필터 및 검색
     list_filter = ('is_verified', 'category', 'created_at')
     search_fields = ('title','question_text', 'ai_answer')
 
     # 정렬 질문횟수가 많은 순서대로
-    ordering = ('-hit_count', '-created_at')
+    ordering = ('-created_at', '-hit_count')
 
 
     # 저장 로직
