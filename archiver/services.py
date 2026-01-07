@@ -1,15 +1,15 @@
 from http.client import responses
+import requests
 import logging
 import re
-import google.generativeai as genai
+import anthropic
 import os
 import time
-import requests
 import json  # 에러 로그 출력을 위해 추가
+import base64
 from PIL import Image
 from certifi import contents
 from django.db.models.expressions import result
-from google.api_core import exceptions
 from dotenv import load_dotenv
 
 from archiver.admin import logger
@@ -18,6 +18,7 @@ from archiver.models import QnALog
 # .env 파일 로드
 load_dotenv()
 logger = logging.getLogger(__name__)
+NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI", "General"]
 
 def check_similarity_and_get_answer(new_question):
     print("🔥 check_similarity_and_get_answer CALLED 🔥")
@@ -27,12 +28,10 @@ def check_similarity_and_get_answer(new_question):
     1. AI를 통해 기존 DB와 유사도 체크
     2. 중복이면 기존 객체 반환, 신규면 None 반환
     """
-    api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = os.getenv("ANTHROPIC_API_KEY")
     print(f"▶ API KEY 로드됨?: {'YES' if api_key else 'NO'}")
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('models/gemini-2.5-flash')
-
+    client = anthropic.Anthropic(api_key=api_key)
 
     past_questions = QnALog.objects.filter(is_verified=True).order_by('-created_at')[:50]
     print(f"▶ is_verified=True 질문 수: {past_questions.count()}")
@@ -60,18 +59,23 @@ def check_similarity_and_get_answer(new_question):
         - 중복이면 반드시 숫자 하나만 출력 (예: 25)
         - NEW면 반드시 NEW만 출력
         - 그 외 텍스트, 설명, 줄바꿈 절대 출력 금지
-    
+
     [기존 리스트]
     {context}
-    
+
     [새 질문]
     {new_question}
     """
     try:
-        response = model.generate_content(prompt)
-        result = response.text.strip()
-        logger.info(response.text)
-
+        response = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=1024,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        result = response.content[0].text.strip()
+        logger.info(result)
 
         if result.isdigit():
             target_id = int(result)
@@ -88,9 +92,8 @@ def check_similarity_and_get_answer(new_question):
 
 def analyze_qna(question_text, image_path=None):
     """신규 질문에 대해 설정하신 조교 답변 생성"""
-    api_key = os.getenv("GOOGLE_API_KEY")
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('models/gemini-2.5-flash')
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    client = anthropic.Anthropic(api_key=api_key)
 
     # 프롬프트
     prompt = f"""
@@ -104,30 +107,68 @@ def analyze_qna(question_text, image_path=None):
     4. **체크포인트**: (실수 방지 팁 하나)
 
     마지막에 질문 성격에 맞는 태그를 반드시 달아줘 (예: #DB, #Python).
-
+    이 리스트에 없는 단어는 절대 사용하지마.
+    카테고리 리스트: {",".join(NOTION_CATEGORIES)}
+    
+    예시: #Python
+    
     질문 내용: {question_text}
     """
 
-    content = [prompt]
+    # 메시지 컨텐츠 구성
+    content = []
+
+    # 이미지가 있는 경우 base64로 인코딩
     if image_path and os.path.exists(image_path):
         try:
-            img = Image.open(image_path)
-            content.append(img)
+            with open(image_path, "rb") as img_file:
+                img_data = base64.standard_b64encode(img_file.read()).decode("utf-8")
+
+            # 이미지 타입 확인
+            image_media_type = "image/jpeg"
+            if image_path.lower().endswith('.png'):
+                image_media_type = "image/png"
+            elif image_path.lower().endswith('.gif'):
+                image_media_type = "image/gif"
+            elif image_path.lower().endswith('.webp'):
+                image_media_type = "image/webp"
+
+            content.append({
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": image_media_type,
+                    "data": img_data,
+                }
+            })
         except Exception as e:
             print(f"이미지 로딩 에러 {e}")
 
+    # 텍스트 프롬프트 추가
+    content.append({
+        "type": "text",
+        "text": prompt
+    })
+
     for attempt in range(3):
         try:
-            response = model.generate_content(content)
-            return response.text
-        except exceptions.ResourceExhausted:
+            response = client.messages.create(
+                model="claude-3-haiku-20240307",
+                max_tokens=4096,
+                messages=[
+                    {"role": "user", "content": content}
+                ]
+            )
+            return response.content[0].text
+        except anthropic.RateLimitError:
             if attempt < 2:
-                time.sleep(10)
+                time.sleep(7)
                 continue
             else:
-                return "현재 사용자가 많아 분석이 지연되고 있습니다"
+                return None
         except Exception as e:
-            return f"오류 발생 : {str(e)}"
+            print(f"AI 에러 {e}")
+            return None
 
 def send_to_notion(obj):
     """노션 전송 및 생성된 페이지 URL을 DB에 저장"""
@@ -181,3 +222,23 @@ def get_final_answer_with_link(obj):
     board_url = os.getenv("NOTION_BOARD_URL")
 
     return f"{obj.ai_answer}\n\n 노션 페이지 확인하기: \n{board_url}"
+
+def extract_category_answer(ai_text):
+    """
+    노션에 설정된 카테고리 목록과 비교하여 일치하는 경우만 반환합니다
+    """
+    if not ai_text:
+        return "General"
+
+    for cat in NOTION_CATEGORIES:
+        if cat.lower() in ai_text.lower():
+            return cat
+
+    match = re.search(r"(\w+)", ai_text)
+    if match:
+        extracted = match.group(1)
+        # 추출된 단어가 카테고리 리스트에있는지 확인
+        for cat in NOTION_CATEGORIES:
+            if cat.lower() == extracted.lower():
+                return cat
+    return "General"

@@ -2,7 +2,7 @@
 디스코드 질문 수집부터 AI 답변 생성, 중복 질문 탐지, 그리고 노션 아카이빙까지 한 번에 관리하는 통합 학습 보조 시스템입니다.
 
 📝 프로젝트 개요
-수강생이 디스코드에서 질문을 던지면, Google Gemini 2.5 Flash 모델이 즉시 답변을 제공합니다. 특히 유사 질문 탐지 엔진을 통해 이미 검증된 정답이 있을 경우 노션 링크를 즉시 안내하여 조교의 업무 효율을 극대화합니다.
+수강생이 디스코드에서 질문을 던지면, Claude 3.5 Sonnet 모델이 즉시 답변을 제공합니다. 특히 유사 질문 탐지 엔진을 통해 이미 검증된 정답이 있을 경우 노션 링크를 즉시 안내하여 조교의 업무 효율을 극대화합니다.
 
 🌟 주요 기능 (Update)
 Discord Bot (!질문): 실시간 질문 감지 및 AI 자동 답변. (기존 !분석에서 변경)
@@ -26,7 +26,7 @@ Notion API 연동: 승인된 질문-답변 쌍을 노션 데이터베이스로 �
 
 데이터가 있는 경우 (중복): hit_count 증가 → (검증 시) 해당 노션 URL 즉시 답변 → 종료.
 
-데이터가 없는 경우 (신규): Gemini AI 분석 → 조교 답변 출력 → DB 임시 저장.
+데이터가 없는 경우 (신규): Claude AI 분석 → 조교 답변 출력 → DB 임시 저장.
 
 검수 및 전송: 관리자가 어드민에서 내용을 확인/수정한 뒤 '검증 완료' 시 노션으로 전송.
 
@@ -35,7 +35,7 @@ Language: Python 3.13+
 
 Framework: Django 5.x (Admin, ORM)
 
-AI: Google Generative AI (Gemini 2.5 Flash)
+AI: Anthropic Claude 3.5 Sonnet
 
 API: Discord API (discord.py), Notion API
 
@@ -45,7 +45,7 @@ Utility: re (Regex for ID extraction), asgiref (Sync-to-Async)
 1. 환경 변수 설정 (.env)
 코드 스니펫
 
-GOOGLE_API_KEY=your_gemini_api_key
+ANTHROPIC_API_KEY=your_claude_api_key
 DISCORD_BOT_TOKEN=your_discord_bot_token
 NOTION_TOKEN=your_notion_token
 NOTION_DB_ID=your_notion_db_id

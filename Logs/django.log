@@ -120,3 +120,286 @@ django.http.response.Http404: “/mnt/c/users/pc777/Desktop/bot/favicon.ico” d
 [INFO] 2025-12-28 13:08:37,053 log "POST /admin/archiver/qnalog/18/change/ HTTP/1.1" 302 0
 [INFO] 2025-12-28 13:08:37,304 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 24134
 [INFO] 2025-12-28 13:08:37,395 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 06:07:18,050 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 07:49:01,652 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 07:49:02,172 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 07:49:10,479 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 07:49:10,852 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:35:47,948 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 08:35:48,516 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:44:47,863 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 08:44:48,344 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:45:46,377 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 08:45:46,777 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:47:50,256 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 08:47:50,512 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:48:46,271 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 08:48:46,603 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:54:27,383 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-05 08:54:27,805 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 08:59:28,640 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:04:19,938 autoreload /Users/mac11/Desktop/bot_project/bot/config/settings.py changed, reloading.
+[INFO] 2026-01-05 09:04:20,315 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:04:33,237 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:09:04,842 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:09:41,191 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:09:42,536 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[WARNING] 2026-01-05 09:09:58,369 log Not Found: /
+[WARNING] 2026-01-05 09:09:58,369 log "GET / HTTP/1.1" 404 2652
+[WARNING] 2026-01-05 09:09:58,454 log Not Found: /favicon.ico
+[WARNING] 2026-01-05 09:09:58,455 log "GET /favicon.ico HTTP/1.1" 404 2733
+[INFO] 2026-01-05 09:10:04,234 log "GET /admin/ HTTP/1.1" 302 0
+[INFO] 2026-01-05 09:10:04,258 log "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4080
+[INFO] 2026-01-05 09:10:04,267 log "GET /static/admin/css/base.css HTTP/1.1" 200 23100
+[INFO] 2026-01-05 09:10:04,272 log "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+[INFO] 2026-01-05 09:10:04,273 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 3538
+[INFO] 2026-01-05 09:10:04,273 log "GET /static/admin/css/login.css HTTP/1.1" 200 951
+[INFO] 2026-01-05 09:10:04,273 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+[INFO] 2026-01-05 09:10:04,274 log "GET /static/admin/css/responsive.css HTTP/1.1" 200 16194
+[INFO] 2026-01-05 09:10:04,275 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+[INFO] 2026-01-05 09:10:08,791 log "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4248
+[INFO] 2026-01-05 09:10:13,788 log "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+[INFO] 2026-01-05 09:10:13,804 log "GET /admin/ HTTP/1.1" 200 8604
+[INFO] 2026-01-05 09:10:13,812 log "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+[INFO] 2026-01-05 09:10:13,815 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 978
+[INFO] 2026-01-05 09:10:13,815 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 593
+[INFO] 2026-01-05 09:10:15,564 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:10:15,578 log "GET /static/admin/css/changelists.css HTTP/1.1" 200 7501
+[INFO] 2026-01-05 09:10:15,579 log "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+[INFO] 2026-01-05 09:10:15,580 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+[INFO] 2026-01-05 09:10:15,582 log "GET /static/admin/css/forms.css HTTP/1.1" 200 8844
+[INFO] 2026-01-05 09:10:15,584 log "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+[INFO] 2026-01-05 09:10:15,585 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+[INFO] 2026-01-05 09:10:15,586 log "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+[INFO] 2026-01-05 09:10:15,587 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+[INFO] 2026-01-05 09:10:15,589 log "GET /static/admin/css/widgets.css HTTP/1.1" 200 11811
+[INFO] 2026-01-05 09:10:15,591 log "GET /static/admin/img/search.svg HTTP/1.1" 200 607
+[INFO] 2026-01-05 09:10:15,592 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:10:15,593 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+[INFO] 2026-01-05 09:10:15,595 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+[INFO] 2026-01-05 09:10:15,597 log "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+[INFO] 2026-01-05 09:10:15,611 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 593
+[INFO] 2026-01-05 09:10:15,611 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1761
+[INFO] 2026-01-05 09:10:15,611 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 928
+[INFO] 2026-01-05 09:10:31,316 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:10:31,333 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:11:18,908 log "GET /admin/auth/group/ HTTP/1.1" 200 8905
+[INFO] 2026-01-05 09:11:18,930 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:11:20,341 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:11:20,363 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:15:41,430 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-05 09:15:43,924 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:16:03,582 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-05 09:16:04,005 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:17:09,928 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:17:26,675 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:17:27,153 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:17:46,497 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:17:46,518 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:17:48,212 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:17:48,230 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:17:50,810 log "GET /admin/archiver/qnalog/?o=2.-1.-5 HTTP/1.1" 200 20035
+[INFO] 2026-01-05 09:17:50,826 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:18:02,553 log "GET /admin/archiver/qnalog/?o=2.-1.-5 HTTP/1.1" 200 20035
+[INFO] 2026-01-05 09:18:02,570 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:21:11,100 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:21:29,768 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:21:30,970 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:21:44,518 log "GET /admin/archiver/qnalog/?o=2.-1.-5 HTTP/1.1" 200 20035
+[INFO] 2026-01-05 09:21:44,536 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:21:56,937 log "GET /admin/ HTTP/1.1" 200 8604
+[INFO] 2026-01-05 09:21:58,619 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:21:58,643 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:25:45,363 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-05 09:25:47,840 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:27:11,712 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:27:30,724 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:27:41,683 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:27:44,061 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:28:02,325 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:28:02,339 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:29:43,620 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 19193
+[INFO] 2026-01-05 09:29:43,636 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:36:27,882 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-05 09:36:30,186 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:36:48,836 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-05 09:36:49,260 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:49:00,924 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:49:42,167 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-05 09:49:42,564 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-05 09:49:58,763 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:49:59,108 log "POST /archiver/qna/ HTTP/1.1" 200 2408
+[INFO] 2026-01-05 09:50:03,230 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 20015
+[INFO] 2026-01-05 09:50:03,244 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:50:13,409 log "GET /admin/archiver/qnalog/34/change/ HTTP/1.1" 200 17061
+[INFO] 2026-01-05 09:50:13,420 log "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+[INFO] 2026-01-05 09:50:13,420 log "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+[INFO] 2026-01-05 09:50:13,427 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:50:19,263 admin [NOTION SUCCESS] ID: 34 전송 및 URL 저장 완료
+[INFO] 2026-01-05 09:50:19,272 log "POST /admin/archiver/qnalog/34/change/ HTTP/1.1" 302 0
+[INFO] 2026-01-05 09:50:19,304 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 20358
+[INFO] 2026-01-05 09:50:19,324 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:50:19,332 log "GET /static/admin/img/icon-yes-dark.svg HTTP/1.1" 200 558
+[INFO] 2026-01-05 09:50:19,332 log "GET /static/admin/img/icon-info-dark.svg HTTP/1.1" 200 630
+[INFO] 2026-01-05 09:52:55,521 log "GET /admin/archiver/qnalog/34/change/ HTTP/1.1" 200 17183
+[INFO] 2026-01-05 09:52:55,538 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-05 09:56:30,840 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-05 09:56:33,307 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-06 02:20:24,774 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-06 02:21:38,807 log "POST /archiver/qna/ HTTP/1.1" 200 3820
+[ERROR] 2026-01-06 02:21:39,591 middlewares Unhandled Exception: name 'extrated' is not defined
+Traceback (most recent call last):
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/django/views/generic/base.py", line 106, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/mac11/Desktop/bot_project/bot/archiver/views.py", line 50, in post
+    extracted_cat = extract_category_answer(ai_result)
+  File "/Users/mac11/Desktop/bot_project/bot/archiver/services.py", line 202, in extract_category_answer
+    if cat.lower() == extrated.lower():
+                      ^^^^^^^^
+NameError: name 'extrated' is not defined. Did you mean: 'extracted'?
+[ERROR] 2026-01-06 02:21:39,598 log Internal Server Error: /archiver/qna/
+[ERROR] 2026-01-06 02:21:39,598 log "POST /archiver/qna/ HTTP/1.1" 500 116
+[INFO] 2026-01-06 02:23:18,227 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-06 02:23:20,644 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-06 02:23:50,644 log "POST /archiver/qna/ HTTP/1.1" 200 4151
+[INFO] 2026-01-06 02:23:52,759 log "POST /archiver/qna/ HTTP/1.1" 200 4236
+[INFO] 2026-01-06 02:42:19,938 log "POST /archiver/qna/ HTTP/1.1" 200 126
+[INFO] 2026-01-06 02:42:20,213 log "POST /archiver/qna/ HTTP/1.1" 200 126
+[INFO] 2026-01-06 02:49:11,671 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-06 02:49:14,128 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-06 03:37:57,871 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-06 03:38:33,357 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:38:33,358 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[ERROR] 2026-01-06 03:38:33,529 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:38:33,530 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[INFO] 2026-01-06 03:44:37,157 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-06 03:45:13,334 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:45:13,335 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[ERROR] 2026-01-06 03:45:13,360 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:45:13,361 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[INFO] 2026-01-06 03:49:22,802 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-06 03:49:55,812 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:49:55,813 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[ERROR] 2026-01-06 03:49:55,897 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:49:55,898 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[INFO] 2026-01-06 03:52:48,178 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-06 03:52:50,594 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-06 03:53:16,051 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:53:16,052 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-06 03:53:16,052 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[ERROR] 2026-01-06 03:53:16,053 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[INFO] 2026-01-07 09:05:39,448 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-07 09:05:55,016 middlewares Unhandled Exception: name 'NOTION_QUESTIONS' is not defined
+Traceback (most recent call last):
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/django/views/generic/base.py", line 106, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/mac11/Desktop/bot_project/bot/.venv/lib/python3.13/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/mac11/Desktop/bot_project/bot/archiver/views.py", line 45, in post
+    ai_result = analyze_qna(question_text, image_path)
+  File "/Users/mac11/Desktop/bot_project/bot/archiver/services.py", line 110, in analyze_qna
+    카테고리 리스트: {",".join(NOTION_QUESTIONS)}
+                               ^^^^^^^^^^^^^^^^
+NameError: name 'NOTION_QUESTIONS' is not defined
+[ERROR] 2026-01-07 09:05:55,021 log Internal Server Error: /archiver/qna/
+[ERROR] 2026-01-07 09:05:55,021 log "POST /archiver/qna/ HTTP/1.1" 500 116
+[INFO] 2026-01-07 09:07:39,148 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:07:39,628 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:08:13,751 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:08:14,226 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:08:56,553 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:08:57,008 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-07 09:10:02,754 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-07 09:10:02,754 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[INFO] 2026-01-07 09:14:25,129 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:14:25,560 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:17:43,848 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:17:44,255 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-07 09:18:13,084 log Service Unavailable: /archiver/qna/
+[ERROR] 2026-01-07 09:18:13,085 log "POST /archiver/qna/ HTTP/1.1" 503 128
+[INFO] 2026-01-07 09:21:19,795 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:21:20,177 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:21:27,499 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:21:27,837 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:24:24,252 log "POST /archiver/qna/ HTTP/1.1" 200 956
+[WARNING] 2026-01-07 09:25:17,164 log Not Found: /
+[WARNING] 2026-01-07 09:25:17,164 log "GET / HTTP/1.1" 404 2652
+[INFO] 2026-01-07 09:25:20,406 log "GET /admin/ HTTP/1.1" 200 8997
+[INFO] 2026-01-07 09:25:20,427 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,428 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,429 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,437 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,438 log "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,438 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,439 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,442 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:20,443 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,094 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 45190
+[INFO] 2026-01-07 09:25:26,104 log "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,104 log "GET /static/admin/css/forms.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,105 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,107 log "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,107 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,108 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,109 log "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,109 log "GET /static/admin/js/core.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,110 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,110 log "GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,111 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,111 log "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,114 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-07 09:25:26,115 log "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,130 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,131 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:26,131 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:28,035 log "GET /admin/archiver/qnalog/52/change/ HTTP/1.1" 200 15815
+[INFO] 2026-01-07 09:25:28,046 log "GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:28,046 log "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:28,053 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[WARNING] 2026-01-07 09:25:52,495 admin [NotionAPIError] 노션 전송 실패 (상태 코드: 500) (User: cld)
+[INFO] 2026-01-07 09:25:52,500 log "POST /admin/archiver/qnalog/52/change/ HTTP/1.1" 302 0
+[INFO] 2026-01-07 09:25:52,550 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 45542
+[INFO] 2026-01-07 09:25:52,566 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-07 09:25:52,574 log "GET /static/admin/img/icon-no-dark.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:25:52,574 log "GET /static/admin/img/icon-yes-dark.svg HTTP/1.1" 304 0
+[INFO] 2026-01-07 09:26:36,850 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:26:37,247 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:27:20,807 autoreload /Users/mac11/Desktop/bot_project/bot/archiver/services.py changed, reloading.
+[INFO] 2026-01-07 09:27:21,115 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:27:53,024 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-07 09:28:38,862 log "POST /archiver/qna/ HTTP/1.1" 200 1251
+[INFO] 2026-01-07 09:29:11,830 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 46279
+[INFO] 2026-01-07 09:29:11,846 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-07 09:29:13,264 log "GET /admin/archiver/qnalog/53/change/ HTTP/1.1" 200 16866
+[INFO] 2026-01-07 09:29:13,278 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-07 09:29:31,050 admin [NOTION SUCCESS] ID: 53 전송 및 URL 저장 완료
+[INFO] 2026-01-07 09:29:31,060 log "POST /admin/archiver/qnalog/53/change/ HTTP/1.1" 302 0
+[INFO] 2026-01-07 09:29:31,111 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 46658
+[INFO] 2026-01-07 09:29:31,127 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-07 09:29:31,135 log "GET /static/admin/img/icon-info-dark.svg HTTP/1.1" 304 0
