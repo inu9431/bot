@@ -28,7 +28,7 @@ NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI
 def check_similarity_and_get_answer(new_question):
     print("\n================ 유사도 체크 시작 ================")
     """
-    1. postgresSQL pg_grgm을 통해 기존 DB와 유사도 체크
+    1. postgresSQL pg_trgm을 통해 기존 DB와 유사도 체크
     2. 중복이면 기존 객체 반환, 신규면 None 반환
     """
     # 유사도 임계값 설정 
