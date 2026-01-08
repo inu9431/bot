@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.indexes import GinIndex
 
 class QnALog(models.Model):
     CATEGORY_CHOICES = [
@@ -34,7 +35,7 @@ class QnALog(models.Model):
         verbose_name="상위 질문")
 
     notion_page_url = models.URLField(max_length=500, null=True, blank=True, verbose_name="노션 페이지 링크")
-
+    keywords = models.JSONField(default=list, blank=True, null=True, verbose_name="세부 키워드")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="수정일")
 
@@ -42,6 +43,14 @@ class QnALog(models.Model):
         verbose_name = "Q&A Log"
         verbose_name_plural = "Q&A 로그 목록"
         ordering = ["-created_at"]
+
+        indexes = [
+            GinIndex(
+                fields =['question_text'],
+                name='qna_question_tgrm_idx',
+                opclasses=['gin_grgm_ops']
+            ),
+        ]
 
     def __str__(self):
         return f"[{self.category}] {self.title}] (빈도: {self.hit_count})"

@@ -74,9 +74,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'archiver',
     'import_export',
     'rest_framework',
+    
 
 ]
 
@@ -118,7 +120,7 @@ DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "bot_db",
-        "USER": "bot_user",
+        "USER": "mac11",
         "PASSWORD": "Murter!679",
         "HOST": "localhost",
         "PORT": "5432",

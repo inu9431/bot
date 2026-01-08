@@ -6,108 +6,48 @@ import google.generativeai as genai
 import os
 import time
 import json  # 에러 로그 출력을 위해 추가
-import base64
+from django.contrib.postgres.search import TrigramSimilarity
 from PIL import Image
 from certifi import contents
 from django.db.models.expressions import result
 from dotenv import load_dotenv
-
 from archiver.admin import logger
 from archiver.models import QnALog
 
 # .env 파일 로드
 load_dotenv()
 logger = logging.getLogger(__name__)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
+    logger.error("GEMINI_API_KEY가 설정되지 않았습니다")
+
 NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI", "General"]
 
 def check_similarity_and_get_answer(new_question):
-    print("🔥 check_similarity_and_get_answer CALLED 🔥")
     print("\n================ 유사도 체크 시작 ================")
-    print(f"▶ 새 질문: {new_question}")
     """
-    1. AI를 통해 기존 DB와 유사도 체크
+    1. postgresSQL pg_grgm을 통해 기존 DB와 유사도 체크
     2. 중복이면 기존 객체 반환, 신규면 None 반환
     """
-    api_key = os.getenv("GEMINI_API_KEY")
-    print(f"▶ API KEY 로드됨?: {'YES' if api_key else 'NO'}")
+    # 유사도 임계값 설정 
+    threshold = 0.3
 
-    genai.configure(api_key=api_key)
-
-    # 먼저 최근 질문들을 모두 조회 (검증 여부 관계없이)
-    past_questions = QnALog.objects.all().order_by('-created_at')[:30]
-    print(f"▶ 전체 질문 수: {past_questions.count()}")
-
-    verified_questions = [q for q in past_questions if q.is_verified]
-    print(f"▶ 그 중 is_verified=True: {len(verified_questions)}개")
-    print(f"▶ 그 중 notion_url 있음: {len([q for q in verified_questions if q.notion_page_url])}개")
-
-    if not past_questions.exists():
-        print("❌ DB에 질문 자체가 없음 → None 반환")
-        return None
-    print("▶ 비교 대상 질문 목록:")
-
-    # 각 질문과 순차적으로 비교
-    for q in past_questions:
-        try:
-            print(f"  비교 중: ID {q.id} - {q.question_text[:50]}...")
-
-            # 질문 전체를 비교 (더 정확한 유사도 판정)
-            q1_text = q.question_text[:500] if len(q.question_text) > 500 else q.question_text
-            q2_text = new_question[:500] if len(new_question) > 500 else new_question
-
-            prompt = f"""Are these two questions asking about the same thing?
-
-Question 1: {q1_text}
-
-Question 2: {q2_text}
-
-Answer with only YES or NO:"""
-
-            model = genai.GenerativeModel('gemini-2.5-flash')
-
-            # 안전 설정 완화
-            safety_settings = {
-                genai.types.HarmCategory.HARM_CATEGORY_HARASSMENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-                genai.types.HarmCategory.HARM_CATEGORY_HATE_SPEECH: genai.types.HarmBlockThreshold.BLOCK_NONE,
-                genai.types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-                genai.types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            }
-
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    max_output_tokens=5,
-                    temperature=0,
-                ),
-                safety_settings=safety_settings
-            )
-
-            # response가 유효한지 확인
-            if not response.candidates or not response.candidates[0].content.parts:
-                print(f"    → 응답 없음 (finish_reason: {response.candidates[0].finish_reason if response.candidates else 'N/A'})")
-                continue
-
-            result = response.text.strip().upper()
-            print(f"    → 응답: {result}")
-
-            if "YES" in result:
-                print(f"✅ 중복 발견! ID {q.id} 반환")
-                return q
-
-        except Exception as e:
-            print(f"    → 에러: {str(e)[:100]}")
-            continue
-
-    print("✅ 모든 비교 완료 - 신규 질문")
+    similar_question = QnALog.objects.annotate(
+        similarity = TrigramSimilarity('question_text', new_question)
+    ).filter(similarity__gt=threshold).order_by('-similarity').first()
+    if similar_question:
+        print(f"유사도 질문 발견 ID: {similar_question.id}, 유사도:{similar_question.similarity:.2f}")
+        return similar_question
+    print("유사도 질문 없음 - 신규 질문으로 판정")
     return None
 
+    
 
 
 def analyze_qna(question_text, image_path=None):
-    """신규 질문에 대해 설정하신 조교 답변 생성"""
-    api_key = os.getenv("GEMINI_API_KEY")
-    genai.configure(api_key=api_key)
-
+    """신규 질문에 대한 조교 답변 생성"""
     # 프롬프트
     prompt = f"""
     너는 불필요한 설명을 하지 않는 실력파 개발 조교야.
@@ -275,12 +215,6 @@ def extract_category_answer(ai_text):
 def extract_keywords(question_text, ai_answer):
     if not question_text and not ai_answer:
         return []
-
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return []
-
-    genai.configure(api_key=api_key)
 
     prompt = f"""
     아래 질문과 답변을 분석해서 핵심 키워드 3~5개를 추출해줘.
