@@ -120,7 +120,7 @@ DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "bot_db",
-        "USER": "mac11",
+        "USER": "bot_user",
         "PASSWORD": "Murter!679",
         "HOST": "localhost",
         "PORT": "5432",

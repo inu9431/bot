@@ -48,7 +48,7 @@ class QnALog(models.Model):
             GinIndex(
                 fields =['question_text'],
                 name='qna_question_tgrm_idx',
-                opclasses=['gin_grgm_ops']
+                opclasses=['gin_trgm_ops']
             ),
         ]
 

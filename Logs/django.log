@@ -690,3 +690,554 @@ NameError: name 'question_text' is not defined. Did you mean: 'quetion_text'?
 [INFO] 2026-01-08 06:07:23,216 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
 [INFO] 2026-01-08 06:07:23,228 log "GET /static/admin/img/icon-no-dark.svg HTTP/1.1" 200 645
 [INFO] 2026-01-08 06:07:23,229 log "GET /static/admin/img/icon-yes-dark.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 11:52:55,673 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 11:53:58,418 autoreload Watching for file changes with StatReloader
+[ERROR] 2026-01-08 11:54:03,281 middlewares Unhandled Exception: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 710, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/sites.py", line 247, in inner
+    return view(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 813, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 67, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 2102, in changelist_view
+    media = self.media + formset.media
+                         ^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 521, in media
+    if self.forms:
+       ^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 207, in forms
+    for i in range(self.total_form_count())
+                   ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 182, in total_form_count
+    initial_forms = self.initial_form_count()
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/models.py", line 718, in initial_form_count
+    return len(self.get_queryset())
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 372, in __len__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 2000, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 95, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.ProgrammingError: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+[ERROR] 2026-01-08 11:54:03,402 middlewares Unhandled Exception: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 710, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/sites.py", line 247, in inner
+    return view(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 813, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 67, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 2102, in changelist_view
+    media = self.media + formset.media
+                         ^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 521, in media
+    if self.forms:
+       ^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 207, in forms
+    for i in range(self.total_form_count())
+                   ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 182, in total_form_count
+    initial_forms = self.initial_form_count()
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/models.py", line 718, in initial_form_count
+    return len(self.get_queryset())
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 372, in __len__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 2000, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 95, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.ProgrammingError: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+[ERROR] 2026-01-08 11:54:03,409 log Internal Server Error: /admin/archiver/qnalog/
+[ERROR] 2026-01-08 11:54:03,443 log Internal Server Error: /admin/archiver/qnalog/
+[ERROR] 2026-01-08 11:54:03,444 log "GET /admin/archiver/qnalog/ HTTP/1.1" 500 116
+[WARNING] 2026-01-08 11:54:21,088 log Not Found: /
+[WARNING] 2026-01-08 11:54:21,089 log "GET / HTTP/1.1" 404 2652
+[WARNING] 2026-01-08 11:54:21,416 log Not Found: /
+[WARNING] 2026-01-08 11:54:21,417 log "GET / HTTP/1.1" 404 2652
+[INFO] 2026-01-08 11:54:26,603 log "GET /admin/ HTTP/1.1" 200 11089
+[ERROR] 2026-01-08 11:54:28,535 middlewares Unhandled Exception: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 710, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/sites.py", line 247, in inner
+    return view(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 813, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 67, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 2102, in changelist_view
+    media = self.media + formset.media
+                         ^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 521, in media
+    if self.forms:
+       ^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 207, in forms
+    for i in range(self.total_form_count())
+                   ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 182, in total_form_count
+    initial_forms = self.initial_form_count()
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/models.py", line 718, in initial_form_count
+    return len(self.get_queryset())
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 372, in __len__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 2000, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 95, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.ProgrammingError: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+[ERROR] 2026-01-08 11:54:28,565 log Internal Server Error: /admin/archiver/qnalog/
+[ERROR] 2026-01-08 11:54:28,566 log "GET /admin/archiver/qnalog/ HTTP/1.1" 500 116
+[INFO] 2026-01-08 11:54:30,048 log "GET /admin/ HTTP/1.1" 200 11089
+[ERROR] 2026-01-08 11:54:39,225 middlewares Unhandled Exception: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 710, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/sites.py", line 247, in inner
+    return view(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 813, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/import_export/admin.py", line 67, in changelist_view
+    return super().changelist_view(request, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 2102, in changelist_view
+    media = self.media + formset.media
+                         ^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 521, in media
+    if self.forms:
+       ^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 207, in forms
+    for i in range(self.total_form_count())
+                   ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/formsets.py", line 182, in total_form_count
+    initial_forms = self.initial_form_count()
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/forms/models.py", line 718, in initial_form_count
+    return len(self.get_queryset())
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 372, in __len__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 2000, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/query.py", line 95, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/mnt/c/users/pc777/Desktop/bot/.venv/lib/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.ProgrammingError: column archiver_qnalog.keywords does not exist
+LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
+                                                             ^
+[ERROR] 2026-01-08 11:54:39,259 log Internal Server Error: /admin/archiver/qnalog/
+[ERROR] 2026-01-08 11:54:39,260 log "GET /admin/archiver/qnalog/ HTTP/1.1" 500 116
+[INFO] 2026-01-08 11:54:45,864 log "GET /admin/ HTTP/1.1" 200 11089
+[INFO] 2026-01-08 12:09:40,398 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/models.py changed, reloading.
+[INFO] 2026-01-08 12:09:49,992 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:10:28,984 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/models.py changed, reloading.
+[INFO] 2026-01-08 12:10:38,913 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:18:01,721 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/models.py changed, reloading.
+[INFO] 2026-01-08 12:18:11,635 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:20:30,476 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/migrations/0001_initial.py changed, reloading.
+[INFO] 2026-01-08 12:20:43,617 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:25:37,050 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/models.py changed, reloading.
+[INFO] 2026-01-08 12:25:47,752 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:28:26,154 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 11698
+[INFO] 2026-01-08 12:28:26,207 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:28:35,625 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 11698
+[INFO] 2026-01-08 12:28:35,673 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:29:33,009 log "POST /archiver/qna/ HTTP/1.1" 200 2533
+[INFO] 2026-01-08 12:30:19,157 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:30:19,230 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 3538
+[INFO] 2026-01-08 12:30:19,231 log "GET /static/admin/css/base.css HTTP/1.1" 200 23100
+[INFO] 2026-01-08 12:30:19,234 log "GET /static/admin/css/changelists.css HTTP/1.1" 200 7501
+[INFO] 2026-01-08 12:30:19,235 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+[INFO] 2026-01-08 12:30:19,236 log "GET /static/admin/css/forms.css HTTP/1.1" 200 8844
+[INFO] 2026-01-08 12:30:19,239 log "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+[INFO] 2026-01-08 12:30:19,256 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+[INFO] 2026-01-08 12:30:19,257 log "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+[INFO] 2026-01-08 12:30:19,259 log "GET /static/admin/css/responsive.css HTTP/1.1" 200 16194
+[INFO] 2026-01-08 12:30:19,274 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:30:19,281 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+[INFO] 2026-01-08 12:30:19,288 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+[INFO] 2026-01-08 12:30:19,311 log "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+[INFO] 2026-01-08 12:30:19,312 log "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+[INFO] 2026-01-08 12:30:19,312 log "GET /static/admin/css/widgets.css HTTP/1.1" 200 11811
+[INFO] 2026-01-08 12:30:19,330 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+[INFO] 2026-01-08 12:30:19,338 log "GET /static/admin/img/search.svg HTTP/1.1" 200 607
+[INFO] 2026-01-08 12:30:19,360 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+[INFO] 2026-01-08 12:30:19,400 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+[INFO] 2026-01-08 12:30:19,419 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 593
+[INFO] 2026-01-08 12:30:19,421 log "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+[INFO] 2026-01-08 12:30:19,421 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 928
+[INFO] 2026-01-08 12:30:19,421 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 593
+[INFO] 2026-01-08 12:30:19,421 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1761
+[INFO] 2026-01-08 12:30:22,342 log "POST /admin/archiver/qnalog/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 12:30:22,385 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:30:22,496 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:31:12,048 log "POST /admin/archiver/qnalog/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 12:31:12,079 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:31:15,112 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:43:58,506 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:44:13,162 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:44:47,107 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:44:56,813 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:45:17,801 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:45:25,399 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:45:44,372 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:45:57,099 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:46:17,518 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:46:27,420 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:46:51,225 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:47:01,088 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:47:25,018 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:47:34,739 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:48:05,837 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:48:18,514 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:48:38,795 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:48:48,457 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:49:11,889 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:49:21,771 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:49:44,946 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:49:54,698 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:50:18,310 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:50:27,976 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:50:51,193 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:51:02,045 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:52:31,785 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:52:41,751 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:53:16,777 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:53:16,813 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 3538
+[INFO] 2026-01-08 12:53:16,813 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+[INFO] 2026-01-08 12:53:16,818 log "GET /static/admin/css/forms.css HTTP/1.1" 200 8844
+[INFO] 2026-01-08 12:53:16,818 log "GET /static/admin/css/changelists.css HTTP/1.1" 200 7501
+[INFO] 2026-01-08 12:53:16,819 log "GET /static/admin/css/base.css HTTP/1.1" 200 23100
+[INFO] 2026-01-08 12:53:16,820 log "GET /static/admin/css/responsive.css HTTP/1.1" 200 16194
+[INFO] 2026-01-08 12:53:16,828 log "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+[INFO] 2026-01-08 12:53:16,828 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+[INFO] 2026-01-08 12:53:16,831 log "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+[INFO] 2026-01-08 12:53:16,854 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:53:16,857 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+[INFO] 2026-01-08 12:53:16,865 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+[INFO] 2026-01-08 12:53:16,882 log "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+[INFO] 2026-01-08 12:53:16,882 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+[INFO] 2026-01-08 12:53:16,882 log "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+[INFO] 2026-01-08 12:53:16,908 log "GET /static/admin/css/widgets.css HTTP/1.1" 200 11811
+[INFO] 2026-01-08 12:53:16,919 log "GET /static/admin/img/search.svg HTTP/1.1" 200 607
+[INFO] 2026-01-08 12:53:16,930 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+[INFO] 2026-01-08 12:53:16,977 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+[INFO] 2026-01-08 12:53:16,978 log "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+[INFO] 2026-01-08 12:53:16,992 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 593
+[INFO] 2026-01-08 12:53:16,993 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1761
+[INFO] 2026-01-08 12:53:16,993 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 928
+[INFO] 2026-01-08 12:53:16,994 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 593
+[INFO] 2026-01-08 12:53:23,410 log "POST /admin/archiver/qnalog/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 12:53:23,441 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:53:23,558 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:55:06,192 log "POST /admin/archiver/qnalog/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 12:55:06,221 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:55:06,300 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:56:00,509 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:56:10,179 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:56:32,888 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:56:37,500 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:57:00,347 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:57:12,793 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:58:04,629 autoreload /mnt/c/users/pc777/Desktop/bot/archiver/admin.py changed, reloading.
+[INFO] 2026-01-08 12:58:17,760 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 12:58:22,037 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:58:22,081 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+[INFO] 2026-01-08 12:58:22,082 log "GET /static/admin/css/changelists.css HTTP/1.1" 200 7501
+[INFO] 2026-01-08 12:58:22,083 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 3538
+[INFO] 2026-01-08 12:58:22,087 log "GET /static/admin/css/base.css HTTP/1.1" 200 23100
+[INFO] 2026-01-08 12:58:22,088 log "GET /static/admin/css/forms.css HTTP/1.1" 200 8844
+[INFO] 2026-01-08 12:58:22,089 log "GET /static/admin/css/responsive.css HTTP/1.1" 200 16194
+[INFO] 2026-01-08 12:58:22,094 log "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+[INFO] 2026-01-08 12:58:22,098 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+[INFO] 2026-01-08 12:58:22,098 log "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+[INFO] 2026-01-08 12:58:22,119 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:58:22,119 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+[INFO] 2026-01-08 12:58:22,142 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+[INFO] 2026-01-08 12:58:22,149 log "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+[INFO] 2026-01-08 12:58:22,149 log "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+[INFO] 2026-01-08 12:58:22,151 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+[INFO] 2026-01-08 12:58:22,171 log "GET /static/admin/css/widgets.css HTTP/1.1" 200 11811
+[INFO] 2026-01-08 12:58:22,196 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+[INFO] 2026-01-08 12:58:22,198 log "GET /static/admin/img/search.svg HTTP/1.1" 200 607
+[INFO] 2026-01-08 12:58:22,255 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+[INFO] 2026-01-08 12:58:22,258 log "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+[INFO] 2026-01-08 12:58:22,262 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 593
+[INFO] 2026-01-08 12:58:22,262 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1761
+[INFO] 2026-01-08 12:58:22,262 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 593
+[INFO] 2026-01-08 12:58:22,263 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 928
+[INFO] 2026-01-08 12:58:26,240 log "GET /admin/archiver/qnalog/1/change/ HTTP/1.1" 200 17529
+[INFO] 2026-01-08 12:58:26,307 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:58:28,372 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:58:30,138 log "POST /admin/archiver/qnalog/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 12:58:30,166 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:58:30,247 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 12:58:39,963 log "POST /admin/archiver/qnalog/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 12:58:39,993 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 12:58:40,071 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 13:00:17,666 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15444
+[INFO] 2026-01-08 13:00:17,703 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 13:00:20,067 log "GET /admin/archiver/qnalog/1/change/ HTTP/1.1" 200 17529
+[INFO] 2026-01-08 13:00:20,105 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 13:00:26,700 admin [NOTION SUCCESS] ID: 1 전송 완료
+[INFO] 2026-01-08 13:00:26,709 log "POST /admin/archiver/qnalog/1/change/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 13:00:26,742 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15975
+[INFO] 2026-01-08 13:00:26,822 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
