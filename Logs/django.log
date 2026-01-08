@@ -648,3 +648,45 @@ NameError: name 'question_text' is not defined. Did you mean: 'quetion_text'?
 [INFO] 2026-01-08 05:56:43,455 autoreload Watching for file changes with StatReloader
 [INFO] 2026-01-08 05:59:44,916 autoreload /Users/mac11/Desktop/bot/archiver/migrations/0001_initial.py changed, reloading.
 [INFO] 2026-01-08 05:59:45,263 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-08 06:05:55,235 log "POST /archiver/qna/ HTTP/1.1" 200 1853
+[INFO] 2026-01-08 06:06:13,479 log "POST /archiver/qna/ HTTP/1.1" 200 1790
+[WARNING] 2026-01-08 06:07:06,268 log Not Found: /
+[WARNING] 2026-01-08 06:07:06,269 log "GET / HTTP/1.1" 404 2652
+[INFO] 2026-01-08 06:07:12,793 log "GET /admin/ HTTP/1.1" 200 9783
+[INFO] 2026-01-08 06:07:12,803 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,805 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,806 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,808 log "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,809 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,810 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,810 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,813 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:12,813 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,623 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 47425
+[INFO] 2026-01-08 06:07:14,636 log "GET /static/admin/css/forms.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,637 log "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,637 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,637 log "GET /static/admin/js/core.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,640 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,641 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,642 log "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,642 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,644 log "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,644 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,645 log "GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,645 log "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,646 log "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,649 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 06:07:14,658 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,658 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:14,659 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:17,402 log "GET /admin/archiver/qnalog/54/change/ HTTP/1.1" 200 16780
+[INFO] 2026-01-08 06:07:17,412 log "GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:17,412 log "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+[INFO] 2026-01-08 06:07:17,420 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[WARNING] 2026-01-08 06:07:23,144 admin [NotionAPIError] 노션 전송 실패 (상태 코드: 400) (User: cld)
+[INFO] 2026-01-08 06:07:23,149 log "POST /admin/archiver/qnalog/54/change/ HTTP/1.1" 302 0
+[INFO] 2026-01-08 06:07:23,198 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 47792
+[INFO] 2026-01-08 06:07:23,216 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-08 06:07:23,228 log "GET /static/admin/img/icon-no-dark.svg HTTP/1.1" 200 645
+[INFO] 2026-01-08 06:07:23,229 log "GET /static/admin/img/icon-yes-dark.svg HTTP/1.1" 304 0
