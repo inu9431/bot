@@ -1241,3 +1241,73 @@ LINE 1: ...uestion_id", "archiver_qnalog"."notion_page_url", "archiver_...
 [INFO] 2026-01-08 13:00:26,709 log "POST /admin/archiver/qnalog/1/change/ HTTP/1.1" 302 0
 [INFO] 2026-01-08 13:00:26,742 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 15975
 [INFO] 2026-01-08 13:00:26,822 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-09 03:44:46,233 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:45:30,595 autoreload /Users/mac11/Desktop/bot/config/settings.py changed, reloading.
+[INFO] 2026-01-09 03:45:30,973 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:45:32,104 autoreload /Users/mac11/Desktop/bot/config/settings.py changed, reloading.
+[INFO] 2026-01-09 03:45:32,453 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:46:59,776 log "POST /archiver/qna/ HTTP/1.1" 200 1070
+[INFO] 2026-01-09 03:53:27,916 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:28,428 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:38,802 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:39,222 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:41,306 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:41,680 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:42,834 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:43,204 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:44,335 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:44,727 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:46,893 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:47,312 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:49,394 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:49,773 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:53:54,000 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:53:54,385 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:06,801 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:07,180 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:11,378 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:11,770 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:13,850 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:14,228 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:16,376 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:16,776 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:18,850 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:19,214 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:21,364 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:21,765 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:24,924 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:25,300 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:26,428 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:26,816 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:28,936 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:29,322 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:36,613 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:37,003 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:38,132 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:38,507 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:54,015 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:54,403 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:54:58,545 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:54:58,913 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:55:46,364 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:55:46,762 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:55:47,892 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:55:48,262 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:57:03,517 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:57:04,023 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:57:45,312 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:57:45,694 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:57:47,835 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:57:48,209 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 03:59:26,101 autoreload /Users/mac11/Desktop/bot/archiver/views.py changed, reloading.
+[INFO] 2026-01-09 03:59:26,586 autoreload Watching for file changes with StatReloader
+[INFO] 2026-01-09 04:00:01,712 log "POST /archiver/qna/ HTTP/1.1" 200 970
+[WARNING] 2026-01-09 04:01:11,076 log Not Found: /
+[WARNING] 2026-01-09 04:01:11,077 log "GET / HTTP/1.1" 404 2652
+[INFO] 2026-01-09 04:01:18,466 log "GET /admin/ HTTP/1.1" 200 10195
+[INFO] 2026-01-09 04:01:20,507 log "GET /admin/archiver/qnalog/ HTTP/1.1" 200 47425
+[INFO] 2026-01-09 04:01:20,530 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-09 04:01:26,842 log "GET /admin/archiver/qnalog/34/change/ HTTP/1.1" 200 17545
+[INFO] 2026-01-09 04:01:26,862 log "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-01-09 04:01:37,772 log "POST /archiver/qna/ HTTP/1.1" 200 2477
+[INFO] 2026-01-09 04:06:26,163 log "POST /archiver/qna/ HTTP/1.1" 200 2477
