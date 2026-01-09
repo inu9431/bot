@@ -1,7 +1,17 @@
+import environ
 import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# env 초기화
+env = environ.Env(
+    # 기본 값
+    DEBUG=(bool, False)
+)
+
+# env 파일 읽기
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # 로그를 저장할 디렉토리
 LOG_BASE_DIR = Path(BASE_DIR) / "Logs"
@@ -62,7 +72,7 @@ SECRET_KEY = 'django-insecure-ndkprbov^o$e+i5(ly^o8a$y=gw94ms#)1l59sgiffoxrt=s^3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web']
 
 
 # Application definition
@@ -119,11 +129,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "bot_db",
-        "USER": "mac11",
-        "PASSWORD": "Murter!679",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": env('POSTGRES_DB'),
+        "USER": env('POSTGRES_USER'),
+        "PASSWORD": env('POSTGRES_PASSWORD'),
+        "HOST": env('POSTGRES_HOST', default='db'),
+        "PORT": env('POSTGRES_PORT', default='5432'),
     }
 }
 

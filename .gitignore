@@ -16,3 +16,4 @@ venv/
 .gitmessage
 media/
 Logs/
+db.sqlite3/

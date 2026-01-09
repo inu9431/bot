@@ -13,7 +13,7 @@ load_dotenv()
 print("2️⃣ imports done")
 token = os.getenv("DISCORD_BOT_TOKEN")
 print("4️⃣ token =", token)
-DJANGO_API_URL = "http://127.0.0.1:8000/archiver/qna/"
+DJANGO_API_URL = "http://web:8000/archiver/qna/"
 NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI", "General"]
 
 # 2. 봇 설정
