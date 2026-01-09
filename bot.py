@@ -19,13 +19,22 @@ NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI
 # 2. 봇 설정
 intents = discord.Intents.default()
 intents.message_content = True
+intents.messages = True
+intents.message_content = True
+intents.guilds = True 
+intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 print("5️⃣ bot object created")
+
+try:
+    intents.threads = True
+except AttributeError:
+    print("이 버전의 라이브러리는 threads속성을 지원하지 않습니다")
 
 @bot.event
 async def on_ready():
     print(f'✅ 봇 로그인 성공: {bot.user.name}')
-print("6️⃣ before bot.run()")
+    
 async def call_django_api(question_text):
     async with aiohttp.ClientSession() as session:
         async with session.post(
@@ -63,6 +72,7 @@ async def send_long_message(reply_target, content, prefix=""):
 
 @bot.event
 async def on_message(message):
+    print(f" 메세지: {message.content} | 채널타입: {message.channel.type} | 작성자: {message.author}")
     # 봇 본인의 메시지는 무시
     if message.author == bot.user:
         return
