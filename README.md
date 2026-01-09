@@ -94,4 +94,39 @@ GIN 인덱스 적용으로 데이터가 쌓여도 응답 속도가 일정하게 
 
 Django Admin 내 save_model 커스터마이징을 통해 "수정은 자유롭게, 전송은 승인 시에만" 이루어지도록 로직을 분리했습니다.
 
+
 AI 답변이 없는 상태에서 전송을 시도할 경우 경고 메시지를 띄워 데이터 누락을 방지합니다.
+
+📅 업데이트 내용 (2026-01-09)
+1. 로컬 개발 환경 도커라이징 (Dockerization)
+Docker 도입: 맥북/윈도우 등 OS 환경에 구애받지 않는 일관된 개발 환경 구축.
+
+Multi-Container 설정: docker-compose를 사용하여 Django(web)와 PostgreSQL(db)을 독립된 컨테이너로 관리.
+
+볼륨 마운트(Volumes): 로컬 코드 수정 사항이 도커 컨테이너에 실시간 반영되도록 설정하여 개발 편의성 증대.
+
+2. 디스코드 봇 - 장고 서버 연동 최적화
+컨테이너 간 통신 설정: 디스코드 봇이 도커 네트워크 내부 주소(http://web:8000)를 통해 장고 API와 통신하도록 아키텍처 개선.
+
+보안 설정 업데이트: ALLOWED_HOSTS에 내부 컨테이너 호스트(web)를 추가하여 안정적인 데이터 송수신 확보.
+
+3. 테스트 및 운영 자동화
+유사 질문 판별 로직: 수강생의 질문이 들어오면 DB 내 유사도를 체크하여 verified(검토완료), duplicate(검토중), new(신규) 상태별로 차등 답변 기능 구현.
+
+노션 링크 반환: 검토가 완료된 질문에 대해 자동으로 노션 페이지 주소를 반환하는 로직 테스트 완료.
+
+Pytest 설정: 테스트 자동화를 위한 pytest.ini 환경 설정 추가.
+
+🛠 실행 방법 (윈도우/맥 공통)
+환경 변수 설정: .env 파일에 DISCORD_BOT_TOKEN, GEMINI_API_KEY, NOTION_TOKEN 등 설정.
+
+컨테이너 빌드 및 실행:
+
+Bash
+
+docker-compose up --build -d
+디스코드 봇 실행:
+
+Bash
+
+docker-compose exec web python run_bot.py
