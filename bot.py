@@ -83,14 +83,15 @@ async def on_message(message):
             # 노션에 등록되있으면 링크 반환
             if result.get("status") == "verified":
                 notion_url = result.get("notion_url")
-                ai_ans = result.get("ai_answer", "정리된 내용을 확인해주세요")
+                
+                if notion_url:
+                    msg_content = f"✅ **이미 정리된 질문입니다! 아래 링크에서 확인해주세요.**\n📋 **노션 링크:** {notion_url}"
+                else:
+                    msg_content = "✅ 이미 정리된 질문입니다! 노션 게시판을 확인해주세요."
 
-                print(f"✅ verified 상태 감지!")
-                print(f"   notion_url = {notion_url}")
-                print(f"   ai_answer = {ai_ans[:50] if ai_ans else None}...")
-
-                msg_content = f"✅ **이미 정리된 질문입니다!**\n\n{ai_ans}\n\n📋 **노션 링크:** {notion_url}"
                 await send_long_message(message, msg_content)
+                
+                
             # 중복 질문 (검토중일떄)
             elif result.get("status") == "duplicate":
                 ai_ans = result.get("ai_answer", "이전 답변을 불러올수 없습니다")
