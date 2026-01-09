@@ -1,4 +1,5 @@
 import logging
+import os
 from tkinter import image_names
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,12 +24,14 @@ class QnABotAPIView(APIView):
 
             logger.info(f"🔍 유사 질문 발견: ID={similar.id}, is_verified={similar.is_verified}, notion_url={similar.notion_page_url}")
 
-            if similar.is_verified and similar.notion_page_url:
+            if similar.is_verified:
+                notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL")
+
                 logger.info(f"✅ verified 상태, 노션 URL 반환: {similar.notion_page_url}")
                 return Response({
                     "status": "verified",
                     "Log_id": similar.id,
-                    "notion_url": similar.notion_page_url,
+                    "notion_url": notion_url,
                     "ai_answer": similar.ai_answer,
                 })
 
@@ -55,11 +58,10 @@ class QnABotAPIView(APIView):
           status=503)
 
         extracted_cat = extract_category_answer(ai_result)
-
         first_line = ai_result.split("\n")[0].replace("1. **문제 요약**:", "").strip()
 
         # 결과 저장
-        if ai_result and "제목:" in ai_result:
+        if "제목:" in ai_result:
             lines = ai_result.split("\n")
             log.title = lines[0].replace("제목:", "").strip()[:100]
             log.ai_answer = "\n".join(lines[1:]).strip()
