@@ -68,11 +68,13 @@ jobs:
       - name: Setup PostgreSQL extensions
         run: |
           PGPASSWORD=test_password psql -h localhost -U test_user -d postgres -c "ALTER USER test_user WITH SUPERUSER;"
-          
+
           PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
         continue-on-error: true
 
       - name: Run tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
         run: uv run pytest 
           
  
