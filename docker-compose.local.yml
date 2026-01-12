@@ -1,14 +1,11 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
     env_file: .env
     environment:
-      - POSTGRES_USER=mac11
-      - POSTGRES_PASSWORD=Murter!67
-      - POSTGRES_DB=bot_db
-    # DB 데이터를 로컬에 보관 (컨테이너 지워도 로컬에 보관)
+      - POSTGRES_USER=${POSTGRES_USER:-bot_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change_me}
+      - POSTGRES_DB=${POSTGRES_DB:-bot_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -16,8 +13,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   web:
     build: .
+    # Development: use Django runserver for autoreload. Production override file will switch to gunicorn.
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8001:8000"
@@ -25,10 +24,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # 로컬에서 작업할떄 코드가 바로 반영되도록 볼륨 연결
     volumes:
       - .:/app
-  
+
   bot:
     build: .
     command: python bot.py
@@ -40,6 +38,19 @@ services:
         condition: service_started
     volumes:
       - .:/app
+
+  worker:
+    build: .
+    command: python manage.py qcluster
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      web:
+        condition: service_started
+    volumes:
+      - .:/app
+    restart: always
 
 volumes:
   postgres_data:

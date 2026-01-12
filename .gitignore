@@ -1,19 +1,31 @@
-# Python-generated files
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
-
-# Virtual environments
-.venv
+.pytest_cache/
 .env
-__pycache__/
-*.pyc
-venv/
-.DS_Store
-.gitmessage
-media/
+logs/
 Logs/
-db.sqlite3/
+.idea/
+11..claude
+uv.lock
+*.pyc
+.DS_Store
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Django
+db.sqlite3
+/logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
+
+# Environment
+.env
+
+# OS
+.DS_Store
