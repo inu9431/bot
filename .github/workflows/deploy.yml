@@ -39,7 +39,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          uv 
+          uv sync
       
       # isort 임포트 순서 검사
       - name: Run isort (Import Sort Check)
