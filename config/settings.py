@@ -186,3 +186,14 @@ Q_CLUSTER = {
     "retry": 300,  # 실패 시 300초(5분) 후에 다시 시도! (우리가 sleep 할 필요 없음)
     "orm": "default",
 }
+
+# Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Discord
+DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+
+# Notion
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+NOTION_DB_ID = os.getenv("NOTION_DB_ID")
+NOTION_BOARD_URL = os.getenv("NOTION_BOARD_URL")
