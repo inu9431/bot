@@ -2,6 +2,7 @@
 
 import django.contrib.postgres.indexes
 import django.db.models.deletion
+from django.contrib.postgres.operations import TrigramExtension
 from django.db import migrations, models
 
 
@@ -11,6 +12,7 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
+        TrigramExtension(),
         migrations.CreateModel(
             name="QnALog",
             fields=[
