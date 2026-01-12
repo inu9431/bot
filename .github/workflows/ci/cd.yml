@@ -44,7 +44,7 @@ jobs:
       # isort 임포트 순서 검사
       - name: Run isort (Import Sort Check)
         run: |
-          uvx isrot . --check-only --diff
+          uvx isort . --check-only --diff
       # black 으로 코드포맷 검사
       - name: Run Black (Format Check)
         run: |
