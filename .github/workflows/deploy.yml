@@ -68,7 +68,7 @@ jobs:
       - name: Setup PostgreSQL extensions
         run: |
           PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
-          continue-on-error: true
+        continue-on-error: true
 
       - name: Run tests
         run: uv run pytest 
