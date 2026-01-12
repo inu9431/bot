@@ -13,7 +13,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # 필수 OS 패키지 설치 (psql 연결용)
 # GCC는 빌드 후 삭제하여 이미지 용량 줄임
-RUN apt-get update && apt-get install -y libpq-dev gcc && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libpq-dev gcc curl && rm -rf /var/lib/apt/lists/*
 
 # 디렉토리 작업 설정
 WORKDIR /app
