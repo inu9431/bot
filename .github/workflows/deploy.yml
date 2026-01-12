@@ -84,27 +84,30 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          # 타임아웃 방지를 위해 명령 실행 시간을 충분히 늘림 (기본 10m -> 20m)
-          command_timeout: 20m
-          script: |
-            set -e
-            echo "🚀 Starting deployment..."
-            cd /home/ubuntu/bot
+      - name: Set up QEMU and Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-            # 1. Git 충돌 방지: GitHub 최신 코드로 강제 동기화
-            echo "📥 Resetting to latest code..."
+      - name: Build image and save to tar (no registry)
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          docker buildx build --platform linux/amd64 -t bot:$TAG --load .
+          docker save bot:$TAG -o image.tar
+
+      - name: Copy image tar to EC2 and deploy (no registry)
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > deploy_key.pem
+          chmod 600 deploy_key.pem
+          scp -o StrictHostKeyChecking=no -i deploy_key.pem image.tar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/image.tar
+          ssh -o StrictHostKeyChecking=no -i deploy_key.pem ubuntu@${{ secrets.EC2_HOST }} \
+            "set -e
+            cd /home/ubuntu/bot
             git fetch origin main
             git reset --hard origin/main
 
-            # 2. .env 생성
-            echo "📝 Creating .env file..."
-            cat << EOF > .env
+            cat << 'EOF' > .env
             DEBUG=False
             SECRET_KEY=${{ secrets.SECRET_KEY }}
             ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
@@ -121,31 +124,12 @@ jobs:
             DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
             EOF
 
-            # 3. 프리티어 메모리 확보: 안 쓰는 이미지 정리
-            echo "🧹 Cleaning up images..."
-            docker system prune -f
-
-            # 4. 빌드 및 배포: 메모리 절약을 위해 --parallel 제거
-            echo "🐳 Building and updating containers..."
-            docker compose -f docker-compose.prod.yml up -d --build
-
-            # 5. Healthcheck 대기 (최대 60초)
-            echo "⏳ Waiting for services..."
-            for i in {1..30}; do
-              if docker compose -f docker-compose.prod.yml ps | grep -q "healthy"; then
-                echo "✅ Web container is healthy!"
-                break
-              fi
-              echo "Still waiting... ($i/30)"
-              sleep 2
-            done
-
-            # 6. DB 마이그레이션
-            echo "🔄 Running migrations..."
+            docker load -i /home/ubuntu/image.tar
+            docker tag bot:${TAG} bot:latest || true
+            docker compose -f docker-compose.prod.yml up -d --no-build
             docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput || true
-
-            echo "✅ Deployment finished!"
-            docker compose -f docker-compose.prod.yml ps
+            echo '🎉 Deployment completed!'" 
+          rm -f image.tar deploy_key.pem
 
       - name: Notify deployment result
         if: always()
