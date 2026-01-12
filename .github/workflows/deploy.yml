@@ -1,141 +1,119 @@
-name: Django CI/CD
+# AWS RDS + EC2 배포용 설정
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --access-logfile - --error-logfile -
+    ports:
+      - "8001:8000"
+    env_file: .env
+    environment:
+      # RDS 연결 정보 (.env에서 가져옴)
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - app-network
 
-on: 
-  push:
-    branches: [ "main", "develop" ]
-  pull_request:
-    branches: [ "main" ]
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python bot.py
+    env_file: .env
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - app-network
 
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py qcluster
+    env_file: .env
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import django; django.setup(); print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - app-network
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_DB: test_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/uv
-          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
-          restore-keys: ${{ runner.os }}-uv-
-
-      - name: Install dependencies
-        run: uv sync
-
-      - name: Run isort (PR only)
-        if: github.event_name == 'pull_request'
-        run: uvx isort . --check-only --diff
-
-      - name: Run Black (Format Check)
-        run: uvx black . --check --diff
-
-      - name: Create .env file for Test
-        run: |
-          cat << EOF > .env
-          DEBUG=True
-          SECRET_KEY=test-secret-key-for-ci
-          DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-          NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}
-          NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
-          DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db
-          EOF
-
-      - name: Install PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
-
-      - name: Setup PostgreSQL extensions
-        run: |
-          PGPASSWORD=test_password psql -h localhost -U test_user -d postgres -c "ALTER USER test_user WITH SUPERUSER;"
-          PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
-
-      - name: Run tests
-        run: uv run pytest
-
-  deploy:
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Set up QEMU and Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build image and save to tar (no registry)
-        env:
-          TAG: ${{ github.sha }}
-        run: |
-          docker buildx build --platform linux/amd64 -t bot:$TAG --load .
-          docker save bot:$TAG -o image.tar
-
-      - name: Copy image tar to EC2 and deploy (no registry)
-        env:
-          TAG: ${{ github.sha }}
-        run: |
-          echo "${{ secrets.EC2_KEY }}" > deploy_key.pem
-          chmod 600 deploy_key.pem
-          scp -o StrictHostKeyChecking=no -i deploy_key.pem image.tar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/image.tar
-          ssh -o StrictHostKeyChecking=no -i deploy_key.pem ubuntu@${{ secrets.EC2_HOST }} \
-            "set -e
-            cd /home/ubuntu/bot
-            git fetch origin main
-            git reset --hard origin/main
-
-            cat << 'EOF' > .env
-            DEBUG=False
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
-            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
-            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-            NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
-            NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}
-            NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PORT=5432
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
-            EOF
-
-            docker load -i /home/ubuntu/image.tar
-            docker tag bot:${TAG} bot:latest || true
-            docker compose -f docker-compose.prod.yml up -d --no-build
-            docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput || true
-            echo '🎉 Deployment completed!'" 
-          rm -f image.tar deploy_key.pem
-
-      - name: Notify deployment result
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment succeeded"
-          else
-            echo "❌ Deployment failed"
-          fi
+networks:
+  app-network:
+    driver: bridge
