@@ -126,7 +126,7 @@ Bash
 
 docker-compose up --build -d
 디스코드 봇 실행:
-
+## 
 Bash
 
 docker-compose exec web python run_bot.py
