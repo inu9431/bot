@@ -4,9 +4,9 @@ from pathlib import Path
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-LOG_DIR = os.path.join(BASE_DIR, "logs", exist_ok=True)
+LOG_DIR = os.path.join(BASE_DIR, "logs")
 if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
+    os.makedirs(LOG_DIR, exist_ok=True)
 
 # env 초기화
 env = environ.Env(
