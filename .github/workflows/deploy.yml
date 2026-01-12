@@ -121,15 +121,15 @@ jobs:
             
             # Docker Compose로 빌드 및 배포
             echo "🐳 Building and starting containers..."
-            sudo docker-compose -f docker-compose.prod.yml up -d --build
+            sudo docker compose -f docker-compose.prod.yml up -d --build
             
             # 마이그레이션 실행
             echo "🔄 Running migrations..."
-            sudo docker-compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
+            sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
             
             # 정적 파일 수집 (필요한 경우)
             echo "📦 Collecting static files..."
-            sudo docker-compose -f docker-compose.prod.yml exec -T web python manage.py collectstatic --noinput || true
+            sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py collectstatic --noinput || true
             
             # 미사용 이미지 정리
             echo "🧹 Cleaning up unused images..."
@@ -137,7 +137,7 @@ jobs:
             
             # 배포 상태 확인
             echo "✅ Checking deployment status..."
-            sudo docker-compose -f docker-compose.prod.yml ps
+            sudo docker compose -f docker-compose.prod.yml ps
             
             echo "🎉 Deployment completed successfully!"
       
