@@ -5,7 +5,6 @@ logs/
 Logs/
 .idea/
 11..claude
-uv.lock
 *.pyc
 .DS_Store
 # Python
