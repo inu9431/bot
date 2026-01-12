@@ -25,6 +25,8 @@ RUN  uv pip install --system --no-cache -r pyproject.toml
 # 소스 코드 복사
 COPY . .
 
+RUN python manage.py collectstatic --noinput
+
 # 실행 권한 부여
 RUN chmod +x manage.py
 
