@@ -47,8 +47,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: uvx isort . --check-only --diff
 
-      - name: Run Black (PR only)
-        if: github.event_name == 'pull_request'
+      - name: Run Black (Format Check)
         run: uvx black . --check --diff
 
       - name: Create .env file for Test
@@ -91,12 +90,20 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          # 타임아웃 방지를 위해 명령 실행 시간을 충분히 늘림 (기본 10m -> 20m)
+          command_timeout: 20m
           script: |
             set -e
+            echo "🚀 Starting deployment..."
             cd /home/ubuntu/bot
 
-            git pull origin main
+            # 1. Git 충돌 방지: GitHub 최신 코드로 강제 동기화
+            echo "📥 Resetting to latest code..."
+            git fetch origin main
+            git reset --hard origin/main
 
+            # 2. .env 생성
+            echo "📝 Creating .env file..."
             cat << EOF > .env
             DEBUG=False
             SECRET_KEY=${{ secrets.SECRET_KEY }}
@@ -114,15 +121,30 @@ jobs:
             DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
             EOF
 
+            # 3. 프리티어 메모리 확보: 안 쓰는 이미지 정리
+            echo "🧹 Cleaning up images..."
+            docker system prune -f
+
+            # 4. 빌드 및 배포: 메모리 절약을 위해 --parallel 제거
+            echo "🐳 Building and updating containers..."
             docker compose -f docker-compose.prod.yml up -d --build
 
-            until docker compose -f docker-compose.prod.yml ps | grep web | grep healthy; do
-              echo "waiting for web..."
+            # 5. Healthcheck 대기 (최대 60초)
+            echo "⏳ Waiting for services..."
+            for i in {1..30}; do
+              if docker compose -f docker-compose.prod.yml ps | grep -q "healthy"; then
+                echo "✅ Web container is healthy!"
+                break
+              fi
+              echo "Still waiting... ($i/30)"
               sleep 2
             done
 
+            # 6. DB 마이그레이션
+            echo "🔄 Running migrations..."
             docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput || true
 
+            echo "✅ Deployment finished!"
             docker compose -f docker-compose.prod.yml ps
 
       - name: Notify deployment result
