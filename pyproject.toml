@@ -16,17 +16,45 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
     "pytest>=9.0.2",
+    "pytest-django>=4.9.0", 
     "django-environ>=0.12.0",
     "django-q2>=1.9.0",
     "gunicorn>=23.0.0",
+    "black>=24.0.0", 
+    "isort>=5.13.0",  
 ]
 
-[tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings" # 본인 프로젝트 설정 경로로 수정
-python_files = ["tests.py", "test_*.py", "*_tests.py"]
+[tool.black]
+line-length = 88
+target-version = ['py313']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | migrations
+)/
+'''
 
-[dependency-groups]
-dev = [
-    "black>=25.12.0",
-    "isort>=7.0.0",
+[tool.isort]
+profile = "black"
+line_length = 88
+skip_gitignore = true
+known_first_party = ["config", "archiver"]  # 본인 앱 이름으로 수정
+skip = ["migrations", ".venv"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+pythonpath = ["."]  # ← 추가
+addopts = [
+    "-v",
+    "--reuse-db",  # ← DB 재사용으로 속도 향상
 ]
