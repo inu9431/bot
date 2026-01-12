@@ -64,7 +64,7 @@ jobs:
           EOF
       - name: Run tests
         run: |
-          uvx pytest -v
+          uv run pytest -v
  
   # CD: 배포 (main 브랜치에 push될 때만)
   deploy:
