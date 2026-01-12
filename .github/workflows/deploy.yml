@@ -1,119 +1,151 @@
-# AWS RDS + EC2 배포용 설정
-services:
-  web:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --access-logfile - --error-logfile -
-    ports:
-      - "8001:8000"
-    env_file: .env
-    environment:
-      # RDS 연결 정보 (.env에서 가져옴)
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-    networks:
-      - app-network
+name: Django CI/CD
 
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: python bot.py
-    env_file: .env
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    depends_on:
-      web:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-    networks:
-      - app-network
+on: 
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
 
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: python manage.py qcluster
-    env_file: .env
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    depends_on:
-      web:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "python", "-c", "import django; django.setup(); print('OK')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-    networks:
-      - app-network
+jobs:
+  # CI: 테스트 및 린트 검사
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    # PostgreSQL 서비스 추가
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+ 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Python 환경 세팅 및 uv 설치
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      
+      - name: Install dependencies
+        run: |
+          uv sync --frozen
+      
+      # isort 임포트 순서 검사
+      - name: Run isort (Import Sort Check)
+        run: |
+          uvx isort . --check-only --diff
+      # black 으로 코드포맷 검사
+      - name: Run Black (Format Check)
+        run: |
+          uvx black . --check --diff
+      # 테스트용 .env 파일 생성
+      - name: Create .env file for Test
+        run: |
+          cat << EOF > .env
+          DEBUG=True
+          SECRET_KEY=test-secret-key-for-ci
+          DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}
+          NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
+          DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db
+          EOF
+      - name: Run tests
+        run: |
+          uvx pytest -v
+ 
+  # CD: 배포 (main 브랜치에 push될 때만)
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
 
-networks:
-  app-network:
-    driver: bridge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            set -e  # 에러 발생 시 즉시 중단
+            
+            echo "🚀 Starting deployment..."
+            
+            # 프로젝트 디렉토리로 이동
+            cd /home/ubuntu/bot
+            
+            # 최신 코드 가져오기
+            echo "📥 Pulling latest code..."
+            git pull origin main
+            
+            # .env 파일 생성 (기존 파일 백업)
+            echo "📝 Creating .env file..."
+            if [ -f .env ]; then
+              cp .env .env.backup
+            fi
+            
+            cat << EOF > .env
+            DEBUG=False
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
+            NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}
+            NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
+            
+            # RDS 연결 정보
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=5432
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
+            EOF
+            
+            # Docker Compose로 빌드 및 배포
+            echo "🐳 Building and starting containers..."
+            sudo docker-compose -f docker-compose.prod.yml up -d --build
+            
+            # 마이그레이션 실행
+            echo "🔄 Running migrations..."
+            sudo docker-compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
+            
+            # 정적 파일 수집 (필요한 경우)
+            echo "📦 Collecting static files..."
+            sudo docker-compose -f docker-compose.prod.yml exec -T web python manage.py collectstatic --noinput || true
+            
+            # 미사용 이미지 정리
+            echo "🧹 Cleaning up unused images..."
+            sudo docker image prune -f
+            
+            # 배포 상태 확인
+            echo "✅ Checking deployment status..."
+            sudo docker-compose -f docker-compose.prod.yml ps
+            
+            echo "🎉 Deployment completed successfully!"
+      
+      - name: Notify deployment result
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment succeeded"
+          else
+            echo "❌ Deployment failed"
+          fi
