@@ -137,9 +137,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default' : env.db(
-        'DATABASE_URL',
-        default='postgres://bot_user:bot_password@localhost:5432/bot_db'
+    "default": env.db(
+        "DATABASE_URL", default="postgres://bot_user:bot_password@localhost:5432/bot_db"
     )
 }
 
