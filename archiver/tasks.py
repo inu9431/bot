@@ -1,12 +1,13 @@
-from .services import QnAService
 import logging
+
+from .services import QnAService
 
 logger = logging.getLogger(__name__)
 
+
 def task_process_question(qeustion_text: str, image_path: str = None):
-"""
-Django-Q 워커가 백그라운드에서 실행하는 태스크
-"""
+
+    #    Django-Q 워커가 백그라운드에서 실행하는 태스크
     service = QnAService()
     try:
         # 유사도 체크 -> Gemini 호출 -> DB 저장

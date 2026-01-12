@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # 가상환경 경로를 미리 등록
-ENV PATH="/app/.venv/bin:$PATH"
+# ENV PATH="/app/.venv/bin:$PATH"
 
 # 바이너리 복사
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -20,7 +20,7 @@ WORKDIR /app
 
 # 라이브러리 설치
 COPY pyproject.toml uv.lock ./
-RUN  uv sync --frozen --no-install-project
+RUN  uv pip install --system --no-cache -r pyproject.toml
 
 # 소스 코드 복사
 COPY . .
@@ -30,4 +30,4 @@ RUN chmod +x manage.py
 
 # 실행 명령
 # Gunicorn 실행 시 worker 
-CMD ["gunicorn", "config.wsgi:application", "--bind" "0.0.0.0:8000", "--workers", "2", "--timeout", "120"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120"]

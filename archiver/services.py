@@ -1,21 +1,26 @@
-
-
 import logging
 import re
-import time
-from django.conf import settings
+
 from django.contrib.postgres.search import TrigramSimilarity
 
-from .models import QnALog
 from .adapters import GeminiAdapter, NotionAdapter
-from .dto import QnADTO
-from common.exceptions import LLMServiceError, NotionAPIError
+from .models import QnALog
 
 logger = logging.getLogger(__name__)
 
+
 class QnAService:
-    NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI", "General"]
-    
+    NOTION_CATEGORIES = [
+        "Git",
+        "Linux",
+        "DB",
+        "Python",
+        "Flask",
+        "Django",
+        "FastAPI",
+        "General",
+    ]
+
     def __init__(self):
         self.gemini = GeminiAdapter()
         self.notion = NotionAdapter()
@@ -28,14 +33,21 @@ class QnAService:
 
         # 1. TrigramSimilarity를 사용하여 유사도 계산 및 필터링
 
-        similar_question = QnALog.objects.annotate(
-            similarity=TrigramSimilarity('question_text', question_text)
-        ).filter(similarity__gt=threshold).order_by('-similarity').first()
+        similar_question = (
+            QnALog.objects.annotate(
+                similarity=TrigramSimilarity("question_text", question_text)
+            )
+            .filter(similarity__gt=threshold)
+            .order_by("-similarity")
+            .first()
+        )
 
         if similar_question:
-            logger.info(f"유사 질문 발견: id={similar_question.id}, similarity={similar_question.similarity:.2f}")
+            logger.info(
+                f"유사 질문 발견: id={similar_question.id}, similarity={similar_question.similarity:.2f}"
+            )
             return similar_question
-            
+
         logger.debug("유사 질문 없음 - 신규 질문으로 판정")
         return None
 
@@ -49,7 +61,7 @@ class QnAService:
         if similar_obj:
             similar_obj.hit_count += 1
             similar_obj.save()
-            return similar_obj, True # (객체, 중복여부)
+            return similar_obj, True  # (객체, 중복여부)
 
         # 2. 신규 질문: AI 답변 생성 (GeminiAdapter 활용)
         prompt = self._build_analyze_prompt(question_text)
@@ -61,13 +73,13 @@ class QnAService:
         keywords = self._extract_keywords_via_ai(question_text, ai_answer)
 
         new_obj = QnALog.objects.create(
-            question_text = question_text,
+            question_text=question_text,
             title=title,
             ai_answer=ai_answer,
             category=category,
             keywords=",".join(keywords),
             hit_count=1,
-            is_verified=False
+            is_verified=False,
         )
         return new_obj, False
 
@@ -88,19 +100,20 @@ class QnAService:
         
         질문 내용: {question_text}
         """
-    
+
     def _extract_category(self, ai_text):
         tags = re.findall(r"#(\w+)", ai_text)
         for tag in tags:
             for cat in self.NOTION_CATEGORIES:
-                if tag.lower() == cat.lower(): return cat
+                if tag.lower() == cat.lower():
+                    return cat
         return "General"
-    
+
     def _extract_title(self, ai_text):
-        """ 제목 파싱 """
+        """제목 파싱"""
         match = re.search(r"제목:\s*(.*)", ai_text)
         return match.group(1).strip() if match else "신규 질문"
-    
+
     def _extract_keywords_via_ai(self, question, answer):
         prompt = f"질문과 답변을 분석해 키워드 3개를 쉼표로 구분해줘: {question[:50]} / {answer[:50]}"
         try:
