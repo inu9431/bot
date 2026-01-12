@@ -28,8 +28,9 @@ class QnABotAPIView(APIView):
             similar.save()
             logger.info(f"🔍 유사 질문 발견: ID={similar.id}")
 
+            notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL", "")
+            
             if similar.is_verified:
-                notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL")
                 return Response(
                     {
                         "status": "verified",
