@@ -138,7 +138,7 @@ jobs:
             
             # Docker Compose로 빌드 및 배포 (병렬 빌드)
             echo "🐳 Building containers..."
-            docker compose -f docker-compose.prod.yml build --parallel
+            docker compose -f docker-compose.prod.yml build
             
             echo "🚀 Starting containers..."
             docker compose -f docker-compose.prod.yml up -d
