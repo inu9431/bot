@@ -1,8 +1,10 @@
 import pytest
 
+
 def test_always_pass():
     """기본 테스트 - 항상 통과"""
     assert True
+
 
 def test_python_works():
     """Python 기본 동작 확인"""
