@@ -39,7 +39,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          uv sync
+          uv 
       
       # isort 임포트 순서 검사
       - name: Run isort (Import Sort Check)
@@ -64,7 +64,7 @@ jobs:
           EOF
       - name: Run tests
         run: |
-          uvx pytest -v
+          uv run pytest
  
   # CD: 배포 (main 브랜치에 push될 때만)
   deploy:
