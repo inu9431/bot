@@ -43,7 +43,7 @@ class QnABotAPIView(APIView):
                 {
                     "status": "duplicate",
                     "log_id": similar.id,
-                    "notion_url": notion_url
+                    "notion_url": notion_url,
                     "ai_answer": similar.ai_answer,
                 }
             )
