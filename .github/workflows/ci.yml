@@ -9,11 +9,25 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
+ 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      #  python 환경 세팅 및 uv 설치
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Install dependencies
+        run: |
+          # sync and install pinned dependencies
+          uv sync --frozen
+      # Ruff 린트검사 - 에러 있으면 중단
+      - name: Run Ruff
+        run: |
+          uvx ruff check .
+          uvx ruff format --check .
+      # 테스트용 .env 파일 생성
       - name: Create .env file for Test
         run: |
           echo "DEBUG=True" >> .env
@@ -22,11 +36,44 @@ jobs:
           echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" >> .env
           echo "NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}" >> .env
           echo "NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}" >> .env
-          
-          # DB 연결 정보 (도커 컴포즈 내부 네트워크용)
-          echo "DATABASE_URL=postgres://user:pass@db:5432/dbname" >> .env
-      
-      - name: build and Run Pytest
+          echo "DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" >> .env
+
+      - name: Run tests
         run: |
-          # 도커 컴포즈로 테스트 실행하고 결과 코드 반환
-          docker-compose up --build --exit-code-from web
+          # Run pytest directly in the CI environment (no docker-compose)
+          uvx pytest -q
+ 
+
+deploy:
+  needs: build-and-test # CI(테스트)가 성공해야만 배포 시작
+  if: github.ref == 'refs/heads/main' # main 브랜치에 push될 때만 실행
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}       # EC2 퍼블릭 IP
+        username: ubuntu                    # EC2 기본 사용자
+        key: ${{ secrets.EC2_KEY }}         # .pem 키 내용 전체
+        script: |
+          cd /home/ubuntu/bot
+          git pull origin main
+          
+          # .env 파일 생성 (EC2 서버의 환경변수들을 GitHub Secrets에서 가져와서 생성)
+         echo "DEBUG=False" > .env
+          echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" >> .env
+          echo "NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}" >> .env
+          echo "NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}" >> .env
+        # 호스트 부분을 GitHub Secrets에 저장한 RDS 엔드포인트(${{ secrets.DB_HOST }})로 교체
+          echo "DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" >> .env
+        # 컨테이너 새로 빌드 및 실행
+          sudo docker-compose up -d --build
+          
+        # 미사용 이미지 정리 (용량 관리)
+          sudo docker image prune -f

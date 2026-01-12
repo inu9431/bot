@@ -1,6 +1,10 @@
 from os import getenv
+import logging
 
-print("BOT FILE LOADED")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info("BOT FILE LOADED")
 import discord
 from discord.ext import commands
 import os
@@ -10,9 +14,9 @@ from pyparsing import with_class
 
 # 1. 환경 변수 및 장고 설정 로드
 load_dotenv()
-print("2️⃣ imports done")
+logger.info("imports done")
 token = os.getenv("DISCORD_BOT_TOKEN")
-print("4️⃣ token =", token)
+logger.debug(f"DISCORD_BOT_TOKEN set: {bool(token)}")
 DJANGO_API_URL = "http://web:8000/archiver/qna/"
 NOTION_CATEGORIES = ["Git", "Linux", "DB", "Python", "Flask", "Django", "FastAPI", "General"]
 
@@ -24,16 +28,16 @@ intents.message_content = True
 intents.guilds = True 
 intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-print("5️⃣ bot object created")
+logger.info("bot object created")
 
 try:
     intents.threads = True
 except AttributeError:
-    print("이 버전의 라이브러리는 threads속성을 지원하지 않습니다")
+    logger.warning("이 버전의 라이브러리는 threads속성을 지원하지 않습니다")
 
 @bot.event
 async def on_ready():
-    print(f'✅ 봇 로그인 성공: {bot.user.name}')
+    logger.info(f'✅ 봇 로그인 성공: {bot.user.name}')
     
 async def call_django_api(question_text):
     async with aiohttp.ClientSession() as session:
@@ -72,7 +76,7 @@ async def send_long_message(reply_target, content, prefix=""):
 
 @bot.event
 async def on_message(message):
-    print(f" 메세지: {message.content} | 채널타입: {message.channel.type} | 작성자: {message.author}")
+    logger.info(f"메세지: {message.content} | 채널타입: {message.channel.type} | 작성자: {message.author}")
     # 봇 본인의 메시지는 무시
     if message.author == bot.user:
         return
@@ -88,7 +92,7 @@ async def on_message(message):
 
         try:
             result = await call_django_api(question_text)
-            print(f"🔥 Django API 응답: {result}")
+            logger.debug(f"🔥 Django API 응답: {result}")
 
             # 노션에 등록되있으면 링크 반환
             if result.get("status") == "verified":
@@ -124,4 +128,5 @@ async def on_message(message):
     # 3. 봇 실행
 if token:
     bot.run(token)
-print("디스코드 토큰이 없습니다 env 파일을 확인해주세요")
+else:
+    logger.error("디스코드 토큰이 없습니다 env 파일을 확인해주세요")
