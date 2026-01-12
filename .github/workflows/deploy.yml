@@ -63,8 +63,8 @@ jobs:
           DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db
           EOF
       - name: Run tests
-        run: |
-          uv run pytest
+        run: uv run pytest 
+          
  
   # CD: 배포 (main 브랜치에 push될 때만)
   deploy:
