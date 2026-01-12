@@ -4,13 +4,15 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import include, path
 
+
 def health_check(request):
     return HttpResponse("ok", status=200)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("archiver/", include("archiver.urls")),
-    path('health/', health_check),
+    path("health/", health_check),
 ]
 
 if settings.DEBUG:
