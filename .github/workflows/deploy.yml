@@ -62,6 +62,14 @@ jobs:
           NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
           DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db
           EOF
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Setup PostgreSQL extensions
+        run: |
+        PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+        continue-on-error: true
+        
       - name: Run tests
         run: uv run pytest 
           
