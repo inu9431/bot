@@ -82,6 +82,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          command_timeout: 30m
           script: |
             set -e  # 에러 발생 시 즉시 중단
             
@@ -97,7 +98,7 @@ jobs:
             # .env 파일 생성 (기존 파일 백업)
             echo "📝 Creating .env file..."
             if [ -f .env ]; then
-              cp .env .env.backup
+              cp .env .env.backup || true
             fi
             
             cat << EOF > .env
@@ -135,9 +136,6 @@ jobs:
             echo "🧹 Cleaning up unused images..."
             sudo docker image prune -f
             
-            # 배포 상태 확인
-            echo "✅ Checking deployment status..."
-            sudo docker compose -f docker-compose.prod.yml ps
             
             echo "🎉 Deployment completed successfully!"
       
