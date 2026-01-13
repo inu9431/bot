@@ -70,7 +70,7 @@ class QnAService:
 
             if not ai_answer:
                 raise Exception("Ai 답변 생성 실패")
-            
+
             # 데이터 추출
             category = self._extract_category(ai_answer)
             title = self._extract_title(ai_answer)
