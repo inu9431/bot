@@ -1,8 +1,6 @@
 import logging
 import re
-
 from django.contrib.postgres.search import TrigramSimilarity
-
 from .adapters import GeminiAdapter, NotionAdapter
 from .models import QnALog
 

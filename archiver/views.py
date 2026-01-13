@@ -55,6 +55,7 @@ class QnABotAPIView(APIView):
         )
 
         image_path = log.image.path if log.image else None
+        obj, is_duplicated = service.process_question_flow(question_text, image_path)
 
         # 비동기 태스크 호출
         async_task(
@@ -63,8 +64,9 @@ class QnABotAPIView(APIView):
 
         return Response(
             {
-                "status": "processing",
-                "log_id": log.id,
+                "status": "new",
+                "log_id": obj.id,
+                "ai_answer": obj.ai_answer,
                 "message": "새로운 질문을 접수했습니다 AI분석을 시작합니다",
             }
         )
