@@ -52,20 +52,21 @@ class GeminiAdapter:
 
         try:
             # 모델 선언 및 호출 방식 단순화 (표준 SDK방식)
-            model = genai.GenerativeModel('models/gemini-2.5-flash')
-        
+            model = genai.GenerativeModel("models/gemini-2.5-flash")
+
             # 안전 설정 및 생성 설정 추가
             response = model.generate_content(
                 content_parts,
                 generation_config=genai.types.GenerationConfig(
-                    max_output_tokens=2048,
-                    temperature=0.7
-                )
+                    max_output_tokens=2048, temperature=0.7
+                ),
             )
-        
+
             # 응답 텍스트 추출 로직 간소화
             if not response or not response.text:
-                logger.warning(f"Gemini 응답 비어있음. Finish Reason: {response.candidates[0].finish_reason if response.candidates else 'N/A'}")
+                logger.warning(
+                    f"Gemini 응답 비어있음. Finish Reason: {response.candidates[0].finish_reason if response.candidates else 'N/A'}"
+                )
                 raise LLMServiceError("Gemini 응답이 비어있습니다")
             return response.text
         except Exception as e:
@@ -77,6 +78,8 @@ class GeminiAdapter:
             logger.error(f"Gemini API 에러 {e}", exc_info=True)
             # 더이상 클라이언트 미지원 에러를 던지지말고 실제 발생 에러를 전달
             raise LLMServiceError(f"AI 응답 생성 실패: {str(e)}")
+
+
 class NotionAdapter:
     """Notion API와 통신을 전담하는 어댑터"""
 

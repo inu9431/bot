@@ -1,55 +1,55 @@
 name: Django CI/CD
 
-on: 
+on:
   push:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  # CI: 테스트 및 린트 검사
+  # 1. CI 단계: 코드 품질 검사 및 테스트
   build-and-test:
     runs-on: ubuntu-latest
-    
-    # PostgreSQL 서비스 추가
     services:
       postgres:
         image: postgres:15
         env:
+          POSTGRES_DB: test_db
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
-          POSTGRES_DB: test_db
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
           --health-retries 5
         ports:
           - 5432:5432
- 
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      # Python 환경 세팅 및 uv 설치
+      - uses: actions/checkout@v4
+
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
           version: "latest"
-      
+
       - name: Install dependencies
-        run: |
-          uv sync --frozen
-      
-      # isort 임포트 순서 검사
+        run: uv sync
+
+      # ⭐ 추가: 코드 포맷 및 임포트 순서 검사
       - name: Run isort (Import Sort Check)
-        run: |
-          uvx isort . --check-only --diff
-      # black 으로 코드포맷 검사
+        run: uvx isort . --check-only --diff
+
       - name: Run Black (Format Check)
+        run: uvx black . --check --diff
+
+      # ⭐ 추가: PostgreSQL 확장(pg_trgm) 설치
+      - name: Setup PostgreSQL extensions for Test
         run: |
-          uvx black . --check --diff
-      # 테스트용 .env 파일 생성
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+
+      # ⭐ 수정: 요청하신 테스트용 .env 구성 적용
       - name: Create .env file for Test
         run: |
           cat << EOF > .env
@@ -62,19 +62,35 @@ jobs:
           NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
           DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db
           EOF
+
       - name: Run tests
-        run: |
-          uv run pytest -v
- 
-  # CD: 배포 (main 브랜치에 push될 때만)
+        run: uv run pytest -v
+
+  # 2. CD 단계: 도커 허브 빌드 및 EC2 배포
   deploy:
     needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/qnabot:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -82,25 +98,14 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          command_timeout: 30m
           script: |
-            set -e  # 에러 발생 시 즉시 중단
-            
-            echo "🚀 Starting deployment..."
-            
-            # 프로젝트 디렉토리로 이동
+            set -e
             cd /home/ubuntu/bot
             
-            # 최신 코드 가져오기
-            echo "📥 Pulling latest code..."
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             
-            # .env 파일 생성 (기존 파일 백업)
-            echo "📝 Creating .env file..."
-            if [ -f .env ]; then
-              cp .env .env.backup || true
-            fi
-            
+            # 실서버 .env 생성 (RDS 정보 반영)
             cat << EOF > .env
             DEBUG=False
             SECRET_KEY=${{ secrets.SECRET_KEY }}
@@ -119,31 +124,11 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
             EOF
+
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            sudo docker compose -f docker-compose.prod.yml pull
+            sudo docker compose -f docker-compose.prod.yml up -d --no-build
             
-            # Docker Compose로 빌드 및 배포
-            echo "🐳 Building and starting containers..."
-            sudo docker compose -f docker-compose.prod.yml up -d --build
-            
-            # 마이그레이션 실행
-            echo "🔄 Running migrations..."
             sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
-            
-            # 정적 파일 수집 (필요한 경우)
-            echo "📦 Collecting static files..."
-            sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py collectstatic --noinput || true
-            
-            # 미사용 이미지 정리
-            echo "🧹 Cleaning up unused images..."
             sudo docker image prune -f
-            
-            
-            echo "🎉 Deployment completed successfully!"
-      
-      - name: Notify deployment result
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment succeeded"
-          else
-            echo "❌ Deployment failed"
-          fi
+            echo "🎉 배포 완료!"
