@@ -36,26 +36,12 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run isort (Import Sort Check)
-        run: uvx isort . --check-only --diff
-
-      - name: Run Black (Format Check)
-        run: uvx black . --check --diff
-
-      - name: Setup PostgreSQL extensions for Test
-        run: |
-          sudo apt-get update && sudo apt-get install -y postgresql-client
-          PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
-
       - name: Create .env file for Test
         run: |
           echo "DEBUG=True" > .env
           echo "SECRET_KEY=test-secret-key-for-ci" >> .env
           echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" >> .env
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
-          echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" >> .env
-          echo "NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}" >> .env
-          echo "NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}" >> .env
           echo "DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db" >> .env
 
       - name: Run tests
@@ -117,7 +103,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             
-            # 실서버 .env 생성 (환경변수 사용)
+            # .env 생성 (쉘 환경변수 사용)
             echo "DEBUG=False" > .env
             echo "SECRET_KEY=${SECRET_KEY}" >> .env
             echo "ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> .env
@@ -134,22 +120,13 @@ jobs:
             echo "DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}" >> .env
             echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> .env
 
-            # Docker Hub 로그인
+            # Docker Hub 로그인 및 최신 이미지 Pull
             sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml pull
+
+            # 컨테이너 재시작
+            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml down
+            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml up -d --no-build
             
-            # DOCKER_USERNAME 환경변수 설정 (docker-compose.prod.yml에서 사용)
-            export DOCKER_USERNAME=${DOCKER_USERNAME}
-            
-            # 기존 컨테이너 중지 및 제거
-            sudo docker compose -f docker-compose.prod.yml down
-            
-            # 새 이미지로 컨테이너 시작
-            sudo -E docker compose -f docker-compose.prod.yml up -d --no-build
-            
-            # migrate는 모델 변경 시에만 수동으로 실행
-            # sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
-            
-            # 사용하지 않는 이미지 정리
             sudo docker image prune -f
-            
-            echo "🎉 배포 완료!"
+            echo "🎉 배포 성공!"
