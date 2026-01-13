@@ -49,7 +49,7 @@ jobs:
 
       - name: Create .env file for Test
         run: |
-          cat << EOF > .env
+          cat << 'EOF' > .env
           DEBUG=True
           SECRET_KEY=test-secret-key-for-ci
           DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
@@ -105,7 +105,7 @@ jobs:
             git reset --hard origin/main
             
             # 실서버 .env 생성 (RDS 정보 반영)
-            cat << EOF > .env
+            cat << 'EOF' > .env
             DEBUG=False
             SECRET_KEY=${{ secrets.SECRET_KEY }}
             ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
