@@ -129,6 +129,6 @@ jobs:
             sudo docker compose -f docker-compose.prod.yml pull
             sudo docker compose -f docker-compose.prod.yml up -d --no-build
             
-            sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
             sudo docker image prune -f
             echo "🎉 배포 완료!"
+          # sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
