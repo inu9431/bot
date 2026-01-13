@@ -93,10 +93,25 @@ jobs:
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_BOARD_URL: ${{ secrets.NOTION_BOARD_URL }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          envs: DOCKER_USERNAME,DOCKER_PASSWORD,SECRET_KEY,ALLOWED_HOSTS,DISCORD_BOT_TOKEN,GEMINI_API_KEY,NOTION_TOKEN,NOTION_DB_ID,NOTION_BOARD_URL,DB_HOST,DB_NAME,DB_USER,DB_PASSWORD
           script: |
             set -e
             cd /home/ubuntu/bot
@@ -104,31 +119,31 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             
-            # 실서버 .env 생성 (RDS 정보 반영)
-            cat << 'EOF' > .env
+            # 실서버 .env 생성 (환경변수 사용)
+            cat << EOF > .env
             DEBUG=False
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
-            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
-            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-            NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
-            NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}
-            NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
+            SECRET_KEY=${SECRET_KEY}
+            ALLOWED_HOSTS=${ALLOWED_HOSTS}
+            DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+            GEMINI_API_KEY=${GEMINI_API_KEY}
+            NOTION_TOKEN=${NOTION_TOKEN}
+            NOTION_DB_ID=${NOTION_DB_ID}
+            NOTION_BOARD_URL=${NOTION_BOARD_URL}
             
             # RDS 연결 정보
-            DB_HOST=${{ secrets.DB_HOST }}
+            DB_HOST=${DB_HOST}
             DB_PORT=5432
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
+            DB_NAME=${DB_NAME}
+            DB_USER=${DB_USER}
+            DB_PASSWORD=${DB_PASSWORD}
+            DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
             EOF
 
             # Docker Hub 로그인
-            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
             
             # DOCKER_USERNAME 환경변수 설정 (docker-compose.prod.yml에서 사용)
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export DOCKER_USERNAME=${DOCKER_USERNAME}
             
             # 최신 이미지 강제 pull
             sudo -E docker compose -f docker-compose.prod.yml pull --ignore-buildable
