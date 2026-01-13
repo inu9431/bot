@@ -118,24 +118,21 @@ jobs:
             git reset --hard origin/main
             
             # 실서버 .env 생성 (환경변수 사용)
-            cat << EOF > .env
-            DEBUG=False
-            SECRET_KEY=${SECRET_KEY}
-            ALLOWED_HOSTS=${ALLOWED_HOSTS}
-            DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-            GEMINI_API_KEY=${GEMINI_API_KEY}
-            NOTION_TOKEN=${NOTION_TOKEN}
-            NOTION_DB_ID=${NOTION_DB_ID}
-            NOTION_BOARD_URL=${NOTION_BOARD_URL}
-            
-            # RDS 연결 정보
-            DB_HOST=${DB_HOST}
-            DB_PORT=5432
-            DB_NAME=${DB_NAME}
-            DB_USER=${DB_USER}
-            DB_PASSWORD=${DB_PASSWORD}
-            DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
-            EOF
+            echo "DEBUG=False" > .env
+            echo "SECRET_KEY=${SECRET_KEY}" >> .env
+            echo "ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> .env
+            echo "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}" >> .env
+            echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> .env
+            echo "NOTION_TOKEN=${NOTION_TOKEN}" >> .env
+            echo "NOTION_DB_ID=${NOTION_DB_ID}" >> .env
+            echo "NOTION_BOARD_URL=${NOTION_BOARD_URL}" >> .env
+            echo "DB_HOST=${DB_HOST}" >> .env
+            echo "DB_PORT=5432" >> .env
+            echo "DB_NAME=${DB_NAME}" >> .env
+            echo "DB_USER=${DB_USER}" >> .env
+            echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+            echo "DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}" >> .env
+            echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> .env
 
             # Docker Hub 로그인
             sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
@@ -143,11 +140,11 @@ jobs:
             # DOCKER_USERNAME 환경변수 설정 (docker-compose.prod.yml에서 사용)
             export DOCKER_USERNAME=${DOCKER_USERNAME}
             
-            # 최신 이미지 강제 pull
-            sudo -E docker compose -f docker-compose.prod.yml pull --ignore-buildable
+            # 기존 컨테이너 중지 및 제거
+            sudo docker compose -f docker-compose.prod.yml down
             
-            # 컨테이너 강제 재생성 (새 이미지로 교체)
-            sudo -E docker compose -f docker-compose.prod.yml up -d --force-recreate --no-build
+            # 새 이미지로 컨테이너 시작
+            sudo -E docker compose -f docker-compose.prod.yml up -d --no-build
             
             # migrate는 모델 변경 시에만 수동으로 실행
             # sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
