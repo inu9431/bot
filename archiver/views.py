@@ -1,6 +1,8 @@
 import logging
 import os
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -10,6 +12,7 @@ from .services import QnAService
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class QnABotAPIView(APIView):
     def post(self, request):
         logger.info("QnABotAPIView POST called")
