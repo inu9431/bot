@@ -25,7 +25,7 @@ class QnAService:
         self.gemini = GeminiAdapter()
         self.notion = NotionAdapter()
 
-    def _check_similarity(self, question_text: str, threshold=0.3):
+    def _check_similarity(self, question_text: str, threshold=0.6):
         """
         PostgreSQL의 pg_trgm을 사용하여 기존 질문들과 유사도 비교
         """
@@ -37,7 +37,7 @@ class QnAService:
             QnALog.objects.annotate(
                 similarity=TrigramSimilarity("question_text", question_text)
             )
-            .filter(similarity__gt=threshold)
+            .filter(is_verified=True, similarity__gt=threshold)
             .order_by("-similarity")
             .first()
         )
@@ -64,24 +64,31 @@ class QnAService:
             return similar_obj, True  # (객체, 중복여부)
 
         # 2. 신규 질문: AI 답변 생성 (GeminiAdapter 활용)
-        prompt = self._build_analyze_prompt(question_text)
-        ai_answer = self.gemini.generate_answer(prompt, image_path)
+        try:
+            prompt = self._build_analyze_prompt(question_text)
+            ai_answer = self.gemini.generate_answer(prompt, image_path)
 
-        # 데이터 추출
-        category = self._extract_category(ai_answer)
-        title = self._extract_title(ai_answer)
-        keywords = self._extract_keywords_via_ai(question_text, ai_answer)
+            if not ai_answer:
+                raise Exception("Ai 답변 생성 실패")
+            
+            # 데이터 추출
+            category = self._extract_category(ai_answer)
+            title = self._extract_title(ai_answer)
+            keywords = self._extract_keywords_via_ai(question_text, ai_answer)
 
-        new_obj = QnALog.objects.create(
-            question_text=question_text,
-            title=title,
-            ai_answer=ai_answer,
-            category=category,
-            keywords=",".join(keywords),
-            hit_count=1,
-            is_verified=False,
-        )
-        return new_obj, False
+            new_obj = QnALog.objects.create(
+                question_text=question_text,
+                title=title,
+                ai_answer=ai_answer,
+                category=category,
+                keywords=",".join(keywords),
+                hit_count=1,
+                is_verified=False,
+            )
+            return new_obj, False
+        except Exception as e:
+            logger.error(f"신규 질문 처리중 에러 발생 {e}")
+            return None, False
 
     def _build_analyze_prompt(self, question_text):
         return f"""
