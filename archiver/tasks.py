@@ -1,13 +1,16 @@
-import os
 import logging
+import os
+
 import requests
+
 from .services import QnAService
 
 logger = logging.getLogger(__name__)
 
+
 def task_process_question(question_text: str, image_path: str = None):
     service = QnAService()
-    
+
     if image_path and not os.path.exists(image_path):
         logger.warning(f"태스크 시작 전 이미지 파일이 존재하지 않음: {image_path}")
 
@@ -28,7 +31,7 @@ def task_process_question(question_text: str, image_path: str = None):
 
         logger.info(f" QnA 처리완료: ID{obj.id} (중복여부: {is_duplicated})")
         return f" 처리 완료 ID {obj.id} (중복: {is_duplicated})"
-        
+
     except Exception as e:
         logger.error(f" 비동기 태스크 실패: {str(e)}", exc_info=True)
         raise e

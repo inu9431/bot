@@ -1,7 +1,6 @@
 import logging
 import os
 
-from django_q.tasks import async_task
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -56,11 +55,6 @@ class QnABotAPIView(APIView):
 
         image_path = log.image.path if log.image else None
         obj, is_duplicated = service.process_question_flow(question_text, image_path)
-
-        # 비동기 태스크 호출
-        async_task(
-            "archiver.tasks.task_process_question", question_text, image_path=image_path
-        )
 
         return Response(
             {
