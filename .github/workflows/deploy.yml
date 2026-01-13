@@ -36,20 +36,17 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      # ⭐ 추가: 코드 포맷 및 임포트 순서 검사
       - name: Run isort (Import Sort Check)
         run: uvx isort . --check-only --diff
 
       - name: Run Black (Format Check)
         run: uvx black . --check --diff
 
-      # ⭐ 추가: PostgreSQL 확장(pg_trgm) 설치
       - name: Setup PostgreSQL extensions for Test
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
           PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
 
-      # ⭐ 수정: 요청하신 테스트용 .env 구성 적용
       - name: Create .env file for Test
         run: |
           cat << EOF > .env
@@ -83,12 +80,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/qnabot:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/qnabot:latest
+            ${{ secrets.DOCKER_USERNAME }}/qnabot:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -125,10 +124,22 @@ jobs:
             DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
             EOF
 
+            # Docker Hub 로그인
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker compose -f docker-compose.prod.yml pull
-            sudo docker compose -f docker-compose.prod.yml up -d --no-build
             
+            # DOCKER_USERNAME 환경변수 설정 (docker-compose.prod.yml에서 사용)
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            
+            # 최신 이미지 강제 pull
+            sudo -E docker compose -f docker-compose.prod.yml pull --ignore-buildable
+            
+            # 컨테이너 강제 재생성 (새 이미지로 교체)
+            sudo -E docker compose -f docker-compose.prod.yml up -d --force-recreate --no-build
+            
+            # migrate는 모델 변경 시에만 수동으로 실행
+            # sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
+            
+            # 사용하지 않는 이미지 정리
             sudo docker image prune -f
+            
             echo "🎉 배포 완료!"
-          # sudo docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
