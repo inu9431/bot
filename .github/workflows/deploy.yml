@@ -48,15 +48,21 @@ jobs:
           PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
 
       - name: Create .env file for Test
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_BOARD_URL: ${{ secrets.NOTION_BOARD_URL }}
         run: |
-          cat << 'EOF' > .env
+          cat << EOF > .env
           DEBUG=True
           SECRET_KEY=test-secret-key-for-ci
-          DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-          NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID=${{ secrets.NOTION_DB_ID }}
-          NOTION_BOARD_URL=${{ secrets.NOTION_BOARD_URL }}
+          DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+          GEMINI_API_KEY=${GEMINI_API_KEY}
+          NOTION_TOKEN=${NOTION_TOKEN}
+          NOTION_DB_ID=${NOTION_DB_ID}
+          NOTION_BOARD_URL=${NOTION_BOARD_URL}
           DATABASE_URL=postgres://test_user:test_password@localhost:5432/test_db
           EOF
 
