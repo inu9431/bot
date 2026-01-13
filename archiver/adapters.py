@@ -50,76 +50,33 @@ class GeminiAdapter:
 
         content_parts.append(prompt)
 
-        # prepare prompt text
-        prompt_text = "\n".join([str(p) for p in content_parts])
-
-        # Try client-based API (google-genai) first
-        if hasattr(genai, "Client"):
-            try:
-                client = (
-                    genai.Client(api_key=self.api_key)
-                    if callable(getattr(genai, "Client"))
-                    else genai.Client()
-                )
-                if hasattr(client, "responses") and hasattr(client.responses, "create"):
-                    resp = client.responses.create(
-                        model="models/gemini-2.5-flash", input=prompt_text
-                    )
-                    text = getattr(resp, "output_text", None) or getattr(
-                        resp, "text", None
-                    )
-                    if not text:
-                        out = getattr(resp, "output", None)
-                        if isinstance(out, list) and out:
-                            parts = []
-                            for o in out:
-                                if isinstance(o, dict):
-                                    for c in o.get("content", []):
-                                        if isinstance(c, dict) and "text" in c:
-                                            parts.append(c["text"])
-                            text = " ".join(parts) if parts else None
-                    if text:
-                        return text
-            except Exception:
-                # ignore and fallback to other patterns
-                pass
-
-        # Try module-level responses API
-        if hasattr(genai, "responses") and hasattr(genai.responses, "create"):
-            try:
-                resp = genai.responses.create(
-                    model="models/gemini-2.5-flash", input=prompt_text
-                )
-                text = (
-                    getattr(resp, "output_text", None)
-                    or getattr(resp, "text", None)
-                    or str(resp)
-                )
-                if text:
-                    return text
-            except Exception:
-                pass
-
         try:
-            # SDK가 제공하는 generate-like API를 사용하도록 가정
-            if hasattr(genai, "generate"):
-                resp = genai.generate(prompt="\n".join([str(p) for p in content_parts]))
-                text = getattr(resp, "text", None) or str(resp)
-                if not text:
-                    raise LLMServiceError("Gemini 응답 없음")
-                return text
-            else:
-                # SDK 미설치/미지원 환경에서는 명확한 에러를 던집니다.
-                raise LLMServiceError("Gemini 클라이언트 미지원")
+            # 모델 선언 및 호출 방식 단순화 (표준 SDK방식)
+            model = genai.GenerativeModel('models/gemini-2.5-flash')
+        
+            # 안전 설정 및 생성 설정 추가
+            response = model.generate_content(
+                content_parts,
+                generation_config=genai.types.GenerationConfig(
+                    max_output_tokens=2048,
+                    temperature=0.7
+                )
+            )
+        
+            # 응답 텍스트 추출 로직 간소화
+            if not response or not response.text:
+                logger.warning(f"Gemini 응답 비어있음. Finish Reason: {response.candidates[0].finish_reason if response.candidates else 'N/A'}")
+                raise LLMServiceError("Gemini 응답이 비어있습니다")
+            return response.text
         except Exception as e:
             msg = str(e).lower()
+            # 힐당량 초과 및 기타 에러 핸들링
             if "quota" in msg or "rate" in msg:
-                logger.warning(f"Quota/Rate limit error from Gemini: {e}")
-                raise LLMServiceError("API 할당량 초과, 나중에 재시도하세요")
-            logger.error(f"Gemini error: {e}", exc_info=True)
-            raise LLMServiceError("AI 응답 생성 실패")
-
-
+                logger.warning(f" Quota/Rate limit error {e}")
+                raise LLMServiceError("API 할달향 초과, 나중에 재시도하세여")
+            logger.error(f"Gemini API 에러 {e}", exc_info=True)
+            # 더이상 클라이언트 미지원 에러를 던지지말고 실제 발생 에러를 전달
+            raise LLMServiceError(f"AI 응답 생성 실패: {str(e)}")
 class NotionAdapter:
     """Notion API와 통신을 전담하는 어댑터"""
 
