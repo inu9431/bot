@@ -121,6 +121,7 @@ jobs:
             echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> .env
 
             # Docker Hub 로그인 및 최신 이미지 Pull
+            sudo docker system prune -a -f
             sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
             sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml pull
             # 마이그레이션 실행
