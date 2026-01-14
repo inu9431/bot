@@ -22,3 +22,14 @@ class SimilarityCheckError(BaseProjectError):
     """유사도 체크 과정에서의 오류"""
 
     pass
+class ValidationError(BaseProjectError):
+    """입력값 검증 실패시 발생"""
+    pass
+
+class AIResponseParsingError(BaseProjectError):
+    """LLM의 응답을 파싱하는 과정에서 에러 발생시"""
+    pass
+
+class DatabaseOperationError(BaseProjectError):
+    """데잍터베이스 작업 중 에러시 발생"""
+    pass
