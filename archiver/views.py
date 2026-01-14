@@ -60,7 +60,7 @@ class QnABotAPIView(APIView):
             title="AI 분석 중",
             hit_count=0
         )
-
+        print(f" DEBUG: 생성된 log 객체: {log}")
 
         obj, _ = service.process_question_flow(question_text, log)
 

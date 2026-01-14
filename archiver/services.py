@@ -56,6 +56,9 @@ class QnAService:
         이미 생성된 log_obj를 받아서 AI 분석 결과로 업데이트
         """
         # 1. 유사도 체크 (기존 질문이 있는지)
+        if not log_obj:
+            logger.error(f" Service received None for log_obj")
+            return None, "ERROR"
 
         image_path = log_obj.image.path if log_obj.image else None
 
