@@ -40,7 +40,7 @@ class QnALogAdmin(ExportActionMixin, admin.ModelAdmin):
         # 이미 있다면 중복 전송 방지
 
         # 검증완료 체크 & 아직 노션 링크가 없을떄만 전송
-        if obj.is_verified and not obj.notion_page_url:
+        if obj.is_verified and not obj.ai_answer:
 
             self.message_user(
                 request,
