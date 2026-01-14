@@ -123,7 +123,8 @@ jobs:
             # Docker Hub 로그인 및 최신 이미지 Pull
             sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
             sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml pull
-
+            # 마이그레이션 실행
+            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml run --rm web python manage.py migrate
             # 컨테이너 재시작
             sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml down
             sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml up -d --no-build
