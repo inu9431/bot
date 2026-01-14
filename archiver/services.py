@@ -5,7 +5,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from common import exceptions
 from .adapters import GeminiAdapter, NotionAdapter
 from .models import QnALog
-from common import exceptions
+from common.exceptions import AIResponseParsingError, DatabaseOperationError
 logger = logging.getLogger(__name__)
 
 
