@@ -26,9 +26,11 @@ class QnABotAPIView(APIView):
         similar = service._check_similarity(question_text)
 
         if similar:
-            similar.hit_count += 1
-            similar.save()
-            logger.info(f"🔍 유사 질문 발견: ID={similar.id}")
+            if similar.is_verified:
+                similar.hit_count += 1
+                similar.save()
+                logger.info(f"🔍 유사 질문 발견: ID={similar.id}")
+
 
             notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL", "")
 
@@ -53,17 +55,21 @@ class QnABotAPIView(APIView):
 
         # 신규 질문 생성 DB에 기록하고 worker 에게 던짐
         log = QnALog.objects.create(
-            question_text=question_text, image=image, title="AI 분석 중"
+            question_text=question_text,
+            image=image,
+            title="AI 분석 중",
+            hit_count=0
         )
 
-        image_path = log.image.path if log.image else None
-        obj, is_duplicated = service.process_question_flow(question_text, image_path)
+
+        obj, _ = service.process_question_flow(question_text, log)
 
         return Response(
             {
                 "status": "new",
                 "log_id": obj.id,
                 "ai_answer": obj.ai_answer,
-                "message": "새로운 질문을 접수했습니다 AI분석을 시작합니다",
+                "keywords": obj.keywords,
+                "message": "AI 분석이 끝났습니다",
             }
         )
