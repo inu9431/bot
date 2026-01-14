@@ -62,8 +62,9 @@ class QnABotAPIView(APIView):
         )
         print(f" DEBUG: 생성된 log 객체: {log}")
 
-        obj, _ = service.process_question_flow(question_text, log)
-
+        obj, _ = service.process_question_flow(question_text, log_obj=log)
+        if obj is None:
+            obj = log
         return Response(
             {
                 "status": "new",

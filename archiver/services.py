@@ -56,11 +56,16 @@ class QnAService:
         이미 생성된 log_obj를 받아서 AI 분석 결과로 업데이트
         """
         # 1. 유사도 체크 (기존 질문이 있는지)
-        if not log_obj:
-            logger.error(f" Service received None for log_obj")
-            return None, "ERROR"
+        if log_obj is None:
+            logger.error(" 서비스가 log_obj를 받지 못했습니다")
+            from .models import QnALog
+            log_obj = QnALog.objects.create(
+                question_text=question_text,
+                title = "에러 복구중"
+            )
 
-        image_path = log_obj.image.path if log_obj.image else None
+
+        current_image_path = log_obj.image.path if log_obj.image else None
 
         similar_obj = self._check_similarity(question_text)
         if similar_obj:
@@ -71,7 +76,7 @@ class QnAService:
         # 2. 신규 질문: AI 답변 생성 (GeminiAdapter 활용)
         try:
             prompt = self._build_analyze_prompt(question_text)
-            ai_answer = self.gemini.generate_answer(prompt, image_path)
+            ai_answer = self.gemini.generate_answer(prompt, current_image_path)
 
             if not ai_answer:
                 raise Exception("Ai 답변 생성 실패")
@@ -81,16 +86,19 @@ class QnAService:
             title = self._extract_title(ai_answer)
             keywords = self._extract_keywords_via_ai(question_text, ai_answer)
 
-            log_obj.title=title,
-            log_obj.ai_answer=ai_answer,
-            log_obj.category=category,
-            log_obj.keywords=",".join(keywords),
+            log_obj.title=title
+            log_obj.ai_answer=ai_answer
+            log_obj.category=category
+            log_obj.keywords=",".join(keywords)
+
             log_obj.save()
+
             logger.info(f" 로그 업데이트 완료 id: {log_obj.id}")
             return log_obj, False
+
         except Exception as e:
             logger.error(f"신규 질문 처리중 에러 발생 {e}")
-            return None, False
+            return log_obj, False
 
     def _build_analyze_prompt(self, question_text):
         return f"""
