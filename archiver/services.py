@@ -51,12 +51,14 @@ class QnAService:
         logger.debug("유사 질문 없음 - 신규 질문으로 판정")
         return None
 
-    def process_question_flow(self, question_text: str, image_path: str = None):
+    def process_question_flow(self, question_text: str, image_path: str = None, log_obj:QnALog=None):
         """
-        전체 흐름 제어: 유사도 체크 -> AI 분석 -> DB 저장
-        (디스코드 봇이 호출하는 메인 메서드)
+        이미 생성된 log_obj를 받아서 AI 분석 결과로 업데이트
         """
         # 1. 유사도 체크 (기존 질문이 있는지)
+
+        image_path = log_obj.image.path if log_obj.image else None
+
         similar_obj = self._check_similarity(question_text)
         if similar_obj:
             similar_obj.hit_count += 1
@@ -76,16 +78,13 @@ class QnAService:
             title = self._extract_title(ai_answer)
             keywords = self._extract_keywords_via_ai(question_text, ai_answer)
 
-            new_obj = QnALog.objects.create(
-                question_text=question_text,
-                title=title,
-                ai_answer=ai_answer,
-                category=category,
-                keywords=",".join(keywords),
-                hit_count=1,
-                is_verified=False,
-            )
-            return new_obj, False
+            log_obj.title=title,
+            log_obj.ai_answer=ai_answer,
+            log_obj.category=category,
+            log_obj.keywords=",".join(keywords),
+            log_obj.save()
+            logger.info(f" 로그 업데이트 완료 id: {log_obj.id}")
+            return log_obj, False
         except Exception as e:
             logger.error(f"신규 질문 처리중 에러 발생 {e}")
             return None, False
@@ -128,3 +127,6 @@ class QnAService:
             return [k.strip() for k in res.split(",") if k.strip()]
         except:
             return []
+
+
+
