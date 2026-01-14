@@ -38,32 +38,26 @@ class QnALogAdmin(ExportActionMixin, admin.ModelAdmin):
         """
         # 검증 완료가 체크되어있고, 아직 노션 링크가 없을떄만 전송
         # 이미 있다면 중복 전송 방지
-        super().save_model(request, obj, form, change)
 
         # 검증완료 체크 & 아직 노션 링크가 없을떄만 전송
         if obj.is_verified and not obj.notion_page_url:
-            if not obj.ai_answer:
-                self.message_user(
-                    request,
-                    " 저장은 완료되었으나 AI답변이 비어있어서 전송은 안되었습니다",
-                    level="warning",
-                )
-                return
-            try:
-                service = QnAService()
-                service.publish_to_notion(obj.id)
 
-                self.message_user(request, f" [notion_success] : {obj.id} 전송 완료")
-
-            except NotionAPIError as e:
-                logger.warning(f" [NotionAPIError] {str(e)}")
-                self.message_user(request, f" 노션 연동 실패 {str(e)}", level="error")
-            except Exception as e:
-                logger.error(f" [System Error] {str(e)}", exc_info=True)
-                self.message_user(request, f" 시스템 오류 발생 {str(e)}", level="error")
+            self.message_user(
+                request,
+                " AI답변이 비어있는 상태로 검증을 완료할수 없습니다",
+                level="warning",
+            )
+            return
+        super().save_model(request, obj, form, change)
+        # 워커가 실행될 떄 메세지
+        if obj.is_verified and not obj.notion_page_url:
+            self.message_user(
+                request,
+                f" {obj.id}번 데이터 노션 업로드 대기열(worker)에 추가되었습니다"
+            )
 
     fieldsets = (
-        ("기본 정보", {"fields": ("category", "title", "hit_count")}),
+        ("기본 정보", {"fields": ("category", "keywords", "title", "hit_count")}),
         ("질문 및 답변", {"fields": ("question_text", "ai_answer")}),
         ("검증 및 연동", {"fields": ("is_verified", "notion_page_url")}),
     )
