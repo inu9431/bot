@@ -1,7 +1,6 @@
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
-
-# sd
+from django_q.tasks import async_task
 
 
 class QnALog(models.Model):
@@ -29,7 +28,7 @@ class QnALog(models.Model):
     ai_answer = models.TextField()  # AI가 정리한 답변
 
     is_verified = models.BooleanField(default=False, verbose_name="검증 완료")
-    hit_count = models.PositiveIntegerField(default=1, verbose_name="질문 빈도")
+    hit_count = models.PositiveIntegerField(default=0, verbose_name="질문 빈도")
     parent_question = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
@@ -42,8 +41,8 @@ class QnALog(models.Model):
     notion_page_url = models.URLField(
         max_length=500, null=True, blank=True, verbose_name="노션 페이지 링크"
     )
-    keywords = models.JSONField(
-        default=list, blank=True, null=True, verbose_name="세부 키워드"
+    keywords = models.TextField(
+         blank=True, null=True, verbose_name="세부 키워드"
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="수정일")
@@ -63,3 +62,12 @@ class QnALog(models.Model):
 
     def __str__(self):
         return f"[{self.category}] {self.title}] (빈도: {self.hit_count})"
+
+    # 검증되고 노션 url이 없는 경우에만 워커 호출
+    def save(self, *args, **kwargs):
+        if self.is_verified and not self.notion_page_url:
+            super().save(*args, **kwargs)
+            async_task("archiver.tasks.task_upload_to_notion", self.id)
+        else:
+            super().save(*args, **kwargs)
+
