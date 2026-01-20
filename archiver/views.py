@@ -1,14 +1,12 @@
 import logging
-import os
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from common import exceptions
 from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
-from .models import QnALog
 from .services import QnAService
+from .adapters import qna_model_to_response_dto
 
 logger = logging.getLogger(__name__)
 
@@ -25,56 +23,40 @@ class QnABotAPIView(APIView):
                 raise ValidationError("question_text는 필수 입력값입니다")
 
             service = QnAService()
-            similar = service._check_similarity(question_text)
+            similar_log = service._check_similarity(question_text)
 
-            if similar:
-                if similar.is_verified:
-                    similar.hit_count += 1
-                    similar.save()
-                    logger.info(f"🔍 유사 질문 발견: ID={similar.id}")
+            if similar_log:
+                if similar_log.is_verified:
+                    similar_log.hit_count += 1
+                    similar_log.save(update_fields=["hit_count"])
+                    logger.info(f"🔍 유사 질문 발견: ID={similar_log.id}")
+                # 모델을 응답 DTO 변환
+                response_dto = qna_model_to_response_dto(similar_log)
+                # Pydantic 모델을 dict로 변환하여 응답
+                response_data = response_dto.model_dump()
 
 
-                notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL", "")
+                # notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL", "")
 
-                if similar.is_verified:
-                    return Response(
-                        {
-                            "status": "verified",
-                            "log_id": similar.id,
-                            "notion_url": notion_url,
-                            "ai_answer": similar.ai_answer,
-                        }
-                    )
+                if similar_log.is_verified:
+                    response_data["status"] = "verified"
+                    return Response(response_data)
+                response_data["status"] = "duplicate"
+                return Response(response_data)
 
-                return Response(
-                    {
-                        "status": "duplicate",
-                        "log_id": similar.id,
-                        "notion_url": notion_url,
-                        "ai_answer": similar.ai_answer,
-                    }
-                )
 
-            # 신규 질문 생성 DB에 기록하고 worker 에게 던짐
-            log = QnALog.objects.create(
+            new_log = service.process_question_flow(
                 question_text=question_text,
-                image=image,
-                title="AI 분석 중",
-                hit_count=0
+                image=image
             )
 
+            response_dto = qna_model_to_response_dto(new_log)
+            response_data = response_dto.model_dump()
+            response_data["status"] = "new"
+            response_data["message"] = "AI 분석이 끝났습니다"
 
-            obj, _ = service.process_question_flow(question_text, log_obj=log)
+            return Response(response_data)
 
-            return Response(
-                {
-                    "status": "new",
-                    "log_id": obj.id,
-                    "ai_answer": obj.ai_answer,
-                    "keywords": obj.keywords,
-                    "message": "AI 분석이 끝났습니다",
-                }
-            )
         except ValidationError as e:
             # 클라이언트 요청이 잘못된 경우
             return Response({"error": e.message}, status=400)

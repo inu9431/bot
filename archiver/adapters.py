@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import Optional
+import re
+from typing import List, Optional
 
 import google.generativeai as genai
 import requests
@@ -8,10 +9,49 @@ from django.conf import settings
 from PIL import Image
 
 from common.exceptions import LLMServiceError, NotionAPIError
-
-from .dto import QnADTO
+from .dto import QnACreateDTO, QnAResponseDTO
+from .models import QnALog
 
 logger = logging.getLogger(__name__)
+
+
+def create_qna_dto_from_ai_response(
+question_text: str,
+    ai_raw_text: str,
+    category: Optional[str] = None,
+    keywords: Optional[List[str]] = None,
+    image_path: Optional[str] = None,
+) -> QnACreateDTO:
+    """
+    AI의 원본 응답 텍스트를 파싱하여 QnACreateDTO 객체를 생성합니다
+    """
+    title_match = re.search(r"제목:\s*(.*)", ai_raw_text)
+    title = title_match.group(1).strip() if title_match else "신규 질문"
+
+    # summary는 첫 200자 정도 추출
+    summary = ai_raw_text.strip()[:200] if ai_raw_text else None
+
+    return QnACreateDTO(
+        question_text=question_text,
+        title=title,
+        summary=summary,
+        # reason, solution_code 등은 이 단계에서는 없으므로 None으로 둡니다.
+        category=category or "General",
+        keywords=keywords or [],
+        image_path=image_path,
+        ai_answer=ai_raw_text,
+        hit_count=1,
+    )
+def qna_model_to_create_dto(qna: QnALog) -> QnACreateDTO:
+    """QnALog Django 모델 객체를 QnACreateDTO로 변환합니다"""
+    return QnACreateDTO.from_orm(qna)
+
+def qna_model_to_response_dto(qna: QnALog) -> QnAResponseDTO:
+    """
+    QnA Django 모델 객체를 QnAResponseDTO로 변환합니다
+    pydantic의 from_attributes 기능 활용
+    """
+    return QnAResponseDTO.from_orm(qna)
 
 
 class GeminiAdapter:
@@ -97,7 +137,7 @@ class NotionAdapter:
             "Notion-Version": "2022-06-28",
         }
 
-    def create_qna_page(self, dto: QnADTO) -> str:
+    def create_qna_page(self, dto: QnACreateDTO) -> str:
         """DTO를 받아서 노션 페이지를 생성하고 생성된 페이지 URL 반환"""
         properties = {
             "이름": {"title": [{"text": {"content": (dto.title or "질문")[:100]}}]},

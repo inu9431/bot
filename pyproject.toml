@@ -23,6 +23,7 @@ dependencies = [
     "black>=24.0.0",
     "isort>=5.13.0",
     "whitenoise>=6.11.0",
+    "pydantic>=2.12.5",
 ]
 
 [tool.black]
