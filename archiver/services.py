@@ -2,10 +2,13 @@ import logging
 import re
 
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.files.uploadedfile import UploadedFile
+
 from common import exceptions
 from .adapters import GeminiAdapter, NotionAdapter
 from .models import QnALog
 from common.exceptions import AIResponseParsingError, DatabaseOperationError
+from typing import Optional
 logger = logging.getLogger(__name__)
 
 
@@ -51,19 +54,22 @@ class QnAService:
         logger.debug("유사 질문 없음 - 신규 질문으로 판정")
         return None
 
-    def process_question_flow(self, question_text: str, image_path: str = None, log_obj:QnALog=None):
+    def process_question_flow(self, question_text: str, image: Optional[UploadedFile] = None) -> QnALog:
         """
         이미 생성된 log_obj를 받아서 AI 분석 결과로 업데이트
         """
         # 1. 유사도 체크 (기존 질문이 있는지)
-        if log_obj is None:
-            logger.error(" 서비스가 log_obj를 받지 못했습니다")
-            from .models import QnALog
+        try:
             log_obj = QnALog.objects.create(
                 question_text=question_text,
-                title = "에러 복구중"
+                image=image,
+                title="AI 분석 중",
+                hit_count = 0
             )
-
+            logger.info(f"신규 질문 로그 생성됨 (ID: {log_obj.id})")
+        except Exception as e:
+            logger.error(f"QnALog 객체 생성 실패: {e}", exc_info=True)
+            raise DatabaseOperationError("질문 로그를 생성하는중 문제가 발생했습니다")
 
         current_image_path = log_obj.image.path if log_obj.image else None
 
@@ -85,9 +91,11 @@ class QnAService:
             log_obj.save()
 
             logger.info(f" 로그 업데이트 완료 id: {log_obj.id}")
-            return log_obj, False
+            return log_obj
         except (AttributeError, TypeError, IndexError) as e:
             logger.error(f"신규 질문 처리중 에러 발생 {e}")
+            log_obj.title = "AI 응답 파싱 실패"
+            log_obj.save()
             raise AIResponseParsingError("AI 응답 형식(키워드, 제목)이 형식에 맞지않습니다")
         except Exception as e:
             logger.error(f"데이터베이스 저장 중 오류 발생: {e}", exc_info=True)
