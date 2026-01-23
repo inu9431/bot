@@ -127,7 +127,7 @@ class QnAService:
             title = title_match.group(1).strip() if title_match else "신규 질문"
 
             # 카테고리 추출
-            category_match = re.search(r"카테고리:\s*(.*?)(?:\n$)", ai_answer)
+            category_match = re.search(r"카테고리:\s*(.*)", ai_answer)
             category = "General"
             if category_match:
                 cat_text = category_match.group(1).strip()
