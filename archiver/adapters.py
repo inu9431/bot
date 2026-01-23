@@ -3,7 +3,7 @@ import os
 import re
 from typing import List, Optional
 
-import google.generativeai as genai
+import google.genai as genai
 import requests
 from django.conf import settings
 from PIL import Image
@@ -44,14 +44,14 @@ question_text: str,
     )
 def qna_model_to_create_dto(qna: QnALog) -> QnACreateDTO:
     """QnALog Django 모델 객체를 QnACreateDTO로 변환합니다"""
-    return QnACreateDTO.from_orm(qna)
+    return QnACreateDTO.model_validate(qna)
 
 def qna_model_to_response_dto(qna: QnALog) -> QnAResponseDTO:
     """
     QnA Django 모델 객체를 QnAResponseDTO로 변환합니다
     pydantic의 from_attributes 기능 활용
     """
-    return QnAResponseDTO.from_orm(qna)
+    return QnAResponseDTO.model_validate(qna)
 
 
 class GeminiAdapter:
@@ -103,13 +103,23 @@ class GeminiAdapter:
             )
 
             # 응답 텍스트 추출 로직 간소화
-            if not response or not response.text:
+            if not response.prompt_feedback.block_reason:
+                block_reason = response.prompt_feedback.block_reson
                 logger.warning(
-                    f"Gemini 응답 비어있음. Finish Reason: {response.candidates[0].finish_reason if response.candidates else 'N/A'}"
-                )
-                raise LLMServiceError("Gemini 응답이 비어있습니다")
+                    f"Gemini 응답 차단되었습니다. 이유: {block_reason}")
+                raise LLMServiceError(f"AI 응답이 차단되었습니다: {block_reason}")
+
+            if response.text:
+                finish_reason = response.candidates[0].finish_reason if response.candidates else 'N/A'
+                logger.warning(f"Gemini 응답이 비어있음 이유: {finish_reason}")
+                raise LLMServiceError("AI 응답이 비어있습니다")
+
             return response.text
+
         except Exception as e:
+            if isinstance(e, LLMServiceError):
+                raise e
+
             msg = str(e).lower()
             # 힐당량 초과 및 기타 에러 핸들링
             if "quota" in msg or "rate" in msg:

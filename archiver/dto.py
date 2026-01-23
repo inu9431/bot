@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+from typing import List, Optional, Any
 from datetime import datetime
 
 
@@ -7,6 +7,7 @@ from datetime import datetime
 
 class QnACreateDTO(BaseModel):
     """AI 분석 결과를 바탕으로 QnA 생성을 요청할떄 사용하는 데이터 전송 객체"""
+    model_config = ConfigDict(frozen = True,from_attributes=True)
 
     question_text: str
     title: str
@@ -20,12 +21,11 @@ class QnACreateDTO(BaseModel):
     ai_answer: Optional[str] = None
     hit_count: Optional[int] = 1
 
-    class Config:
-        frozen = True # 객체 생성 후 수정불가
-        from_attributes = True
 
 
 class QnAResponseDTO(BaseModel):
+        model_config = ConfigDict(frozen = True,from_attributes=True)
+
         id: int
         question_text: str
         title: str
@@ -40,7 +40,10 @@ class QnAResponseDTO(BaseModel):
         hit_count: Optional[int] = 1
         created_at: Optional[datetime] = None
 
-        class Config:
-            frozen = True
-            from_attributes = True # Django에서 모든 모델 같은 객체에서 바로 DTO룰 생성할수 있게 해주는 설정
+        @field_validator("keywords", mode ='before')
+        @classmethod
+        def split_keywords(clsl, v:Any) -> Optional[List[str]]:
+            if isinstance(v, str):
+                return [item.strip() for item in v.split(',') if item.strip()]
+            return v
 

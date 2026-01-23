@@ -24,6 +24,7 @@ dependencies = [
     "isort>=5.13.0",
     "whitenoise>=6.11.0",
     "pydantic>=2.12.5",
+    "google-genai>=1.60.0",
 ]
 
 [tool.black]
@@ -60,3 +61,6 @@ addopts = [
     "-v",
     "--reuse-db",  # ← DB 재사용으로 속도 향상
 ]
+
+[tool.setuptools]
+packages = ["config", "common", "archiver"]
