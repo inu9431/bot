@@ -136,9 +136,10 @@ class QnAService:
                         category = cat
                         break
             # 키워드 추출
-            keywords_match = re.search(r"키워드:\s*(.*?)(?:\n$)", ai_answer)
+            keywords_match = re.search(r"키워드:\s*(.*?)(?=\n|\[)", ai_answer, re.DOTALL)
             keywords = []
             if keywords_match:
+                keywords_str = keywords_match.group(1).strip()
                 keywords = [k.strip() for k in keywords_match.group(1).split(",") if k.strip()]
 
             return {
