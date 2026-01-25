@@ -51,7 +51,7 @@ def mock_notion_adapter():
         mock_instance = MockNotion.return_value
         mock_instance.create_qna_page.return_value = "https://notion.so/fake-page-123"
         yield mock_instance
-        
+
 # ==================================================================================
 # 기능 테스트
 # ==================================================================================
