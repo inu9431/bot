@@ -52,9 +52,9 @@ def mock_notion_adapter():
     with patch("archiver.services.NotionAdapter") as MockNotion:
         mock_instance = MockNotion.return_value
 
-        mock_instance.save_to_notion.return_value = NOTION_TOKEN
+        mock_instance.save_to_notion.return_value = "fake-notion-page-id-123"
         yield mock_instance
-
+        
 # ==================================================================================
 # 기능 테스트
 # ==================================================================================
