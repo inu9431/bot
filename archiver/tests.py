@@ -43,7 +43,17 @@ def mock_gemini_adapter():
         """
         mock_instance.generate_answer.return_value = fake_ai_response
         yield mock_instance # 테스트 함수에 이 mock_instance 전달
+def mock_notion_adapter():
+    """
+    NotionAdapter를 가짜로 대체하는 Fixture
+    테스트 실행중 실제 Notion API 호출을 방지
+    """
+    with patch("archiver.services.NotionAdapter") as MockNotion:
+        mock_instance = MockNotion.return_value
 
+        mock_instance.save_to_notion.return_value = NOTION_TOKEN
+        yield mock_instance
+        
 # ==================================================================================
 # 기능 테스트
 # ==================================================================================
