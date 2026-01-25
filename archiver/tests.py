@@ -61,7 +61,7 @@ def mock_notion_adapter():
 class TestQnABotAPI:
     """QnABotAPIVIEW의 주요 기능 흐름을 테스트합니다"""
 
-    def test_new_question_flow(self, api_client, qna_bot_url, mock_gemini_adapter):
+    def test_new_question_flow(self, api_client, qna_bot_url, mock_gemini_adapter, mock_notion_adapter):
         """
         [통합 테스트/성공] 실규 질문 시, View-Service-DB 연동 및 AI 응답 처리 흐름을 검증
         """
