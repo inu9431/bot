@@ -43,6 +43,7 @@ def mock_gemini_adapter():
         """
         mock_instance.generate_answer.return_value = fake_ai_response
         yield mock_instance # 테스트 함수에 이 mock_instance 전달
+@pytest.fixture
 def mock_notion_adapter():
     """
     NotionAdapter를 가짜로 대체하는 Fixture
