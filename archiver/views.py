@@ -63,7 +63,9 @@ class QnABotAPIView(APIView):
         except LLMServiceError as e:
             # 외부 서비스에 문제가 생긴경우
             return Response({"error": e.message}, status=503)
-        except (AIResponseParsingError, DatabaseOperationError) as e:
+        except AIResponseParsingError as e:
+            return Response({"error": e.message}, status=400)
+        except DatabaseOperationError as e:
             # 파싱 문제인 경우
             return Response({"error": e.message}, status=500)
         except Exception as e:

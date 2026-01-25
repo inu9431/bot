@@ -3,6 +3,8 @@ from django.test import TestCase
 from django.urls import reverse
 from unittest.mock import patch, MagicMock
 
+from google.genai.tests.client.test_async_stream import responses
+
 from .models import QnALog
 from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
 @pytest.fixture
@@ -94,4 +96,41 @@ class TestQnABotAPI:
 
         mock_notion_adapter.save_to_notion.assert_called_once_with(created_log)
 
+    def test_ai_response_parsing_failure(self, api_client, qna_bot_url, mock_gemini_adapter, mock_notion_adapter):
+        """
+        [통합 테스트] AI 응답이 예상과 다른 형식일떄, 파싱 에러를  핸들링하는지 검증
+        """
+
+        mock_gemini_adapter.generate_answer.return_value = None
+        request_data = {"question_text": "AI 파싱 실패 테스트"}
+
+        response = api_client.post(qna_bot_url, request_data, format="json")
+
+        assert response.status_code == 400
+        assert "AI 답변 생성 실패" in response.json()["error"]
+
+        mock_notion_adapter.save_to_notion.assert_not_called()
+
+
+    def test_notion_api_failure(self, api_client, qna_bot_url, mock_gemini_adapter, mock_notion_adapter):
+        """
+        [통합 테스트 성공] Notion 저장에 실패하더라도, 전체 흐름은 중단되지 않고 성공 응답을 반환하는지 검증
+        """
+        mock_notion_adapter.save_to_notion.side_effect = Exception("Notion API 에러 발생")
+        request_data = {"question_text": "Notion API 실패 테스트 질문"}
+
+        response = api_client.post(qna_bot_url, request_data, format="json")
+
+        # 노션 저장 실패했지만 AI응답은 성공
+        assert response.status_code == 200
+        response_data = response.json()
+        assert response_data["status"] == "new"
+
+        # DB저장 및 AI 분석은 정상이어야함
+        assert QnALog.objects.count() == 1
+        log = QnALog.objects.first()
+        assert log.title == "AI가 생성한 테스트 제목"
+
+        mock_gemini_adapter.generate_answer.assert_called_once()
+        mock_notion_adapter.save_to_notion.assert_called_once()
 

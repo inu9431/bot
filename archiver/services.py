@@ -80,7 +80,7 @@ class QnAService:
             ai_answer = self.gemini.generate_answer(prompt, current_image_path)
 
             if not ai_answer:
-                raise AIResponseParsingError("Ai 답변 생성 실패")
+                raise AIResponseParsingError("AI 답변 생성 실패")
 
             parsed_data = self._parse_ai_response(ai_answer)
 
@@ -104,6 +104,8 @@ class QnAService:
             log_obj.title = "AI 응답 파싱 실패"
             log_obj.save()
             raise AIResponseParsingError("AI 응답 형식(키워드, 제목)이 형식에 맞지않습니다")
+        except AIResponseParsingError:
+            raise
         except Exception as e:
             logger.error(f"데이터베이스 저장 중 오류 발생: {e}", exc_info=True)
             raise DatabaseOperationError("결과를 데이터베이스에 저장하는 중 문제가 발생했습니다")
