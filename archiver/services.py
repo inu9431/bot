@@ -91,7 +91,14 @@ class QnAService:
             log_obj.save()
 
             logger.info(f" 로그 업데이트 완료 id: {log_obj.id}")
+            try:
+                self.notion.save_to_notion(log_obj)
+                logger.info(f"Notion 아카이빙 성공: {log_obj.id}")
+            except Exception as e:
+                logger.error(f"Notion 저장 실패 ID: {log_obj.id}: {e}", exc_info=True)
+
             return log_obj
+            
         except (AttributeError, TypeError, IndexError) as e:
             logger.error(f"신규 질문 처리중 에러 발생 {e}")
             log_obj.title = "AI 응답 파싱 실패"

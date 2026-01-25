@@ -92,6 +92,6 @@ class TestQnABotAPI:
         # 외부 서비스가 올바르게 호출되었는지 검증
         mock_gemini_adapter.generate_answer.assert_called_once()
 
-        mock_notion_adapter.save_to_notion.assert_called_once()
+        mock_notion_adapter.save_to_notion.assert_called_once_with(created_log)
 
 
