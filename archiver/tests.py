@@ -43,7 +43,18 @@ def mock_gemini_adapter():
         """
         mock_instance.generate_answer.return_value = fake_ai_response
         yield mock_instance # 테스트 함수에 이 mock_instance 전달
+@pytest.fixture
+def mock_notion_adapter():
+    """
+    NotionAdapter를 가짜로 대체하는 Fixture
+    테스트 실행중 실제 Notion API 호출을 방지
+    """
+    with patch("archiver.services.NotionAdapter") as MockNotion:
+        mock_instance = MockNotion.return_value
 
+        mock_instance.save_to_notion.return_value = "fake-notion-page-id-123"
+        yield mock_instance
+        
 # ==================================================================================
 # 기능 테스트
 # ==================================================================================
@@ -51,7 +62,7 @@ def mock_gemini_adapter():
 class TestQnABotAPI:
     """QnABotAPIVIEW의 주요 기능 흐름을 테스트합니다"""
 
-    def test_new_question_flow(self, api_client, qna_bot_url, mock_gemini_adapter):
+    def test_new_question_flow(self, api_client, qna_bot_url, mock_gemini_adapter, mock_notion_adapter):
         """
         [통합 테스트/성공] 실규 질문 시, View-Service-DB 연동 및 AI 응답 처리 흐름을 검증
         """
@@ -80,5 +91,7 @@ class TestQnABotAPI:
 
         # 외부 서비스가 올바르게 호출되었는지 검증
         mock_gemini_adapter.generate_answer.assert_called_once()
+
+        mock_notion_adapter.save_to_notion.assert_called_once_with(created_log)
 
 
