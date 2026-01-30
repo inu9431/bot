@@ -103,13 +103,13 @@ class GeminiAdapter:
             )
 
             # 응답 텍스트 추출 로직 간소화
-            if not response.prompt_feedback.block_reason:
-                block_reason = response.prompt_feedback.block_reson
+            if response.prompt_feedback.block_reason:
+                block_reason = response.prompt_feedback.block_reason
                 logger.warning(
                     f"Gemini 응답 차단되었습니다. 이유: {block_reason}")
                 raise LLMServiceError(f"AI 응답이 차단되었습니다: {block_reason}")
 
-            if response.text:
+            if not response.text:
                 finish_reason = response.candidates[0].finish_reason if response.candidates else 'N/A'
                 logger.warning(f"Gemini 응답이 비어있음 이유: {finish_reason}")
                 raise LLMServiceError("AI 응답이 비어있습니다")

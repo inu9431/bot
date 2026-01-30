@@ -67,7 +67,7 @@ class QnALog(models.Model):
     def save(self, *args, **kwargs):
         if self.is_verified and not self.notion_page_url:
             super().save(*args, **kwargs)
-            async_task("archiver.tasks.task_upload_to_notion", self.id)
+            async_task("archiver.tasks.task_process_question", self.id)
         else:
             super().save(*args, **kwargs)
 
