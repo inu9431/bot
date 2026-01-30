@@ -19,32 +19,16 @@ class QnABotAPIView(APIView):
             question_text = request.data.get("question_text")
             image = request.FILES.get("image")
 
-            if not question_text:
-                raise ValidationError("question_text는 필수 입력값입니다")
-
             service = QnAService()
-            similar_log = service._check_similarity(question_text)
 
-            if similar_log:
-                if similar_log.is_verified:
-                    similar_log.hit_count += 1
-                    similar_log.save(update_fields=["hit_count"])
-                    logger.info(f"🔍 유사 질문 발견: ID={similar_log.id}")
-                # 모델을 응답 DTO 변환
-                response_dto = qna_model_to_response_dto(similar_log)
-                # Pydantic 모델을 dict로 변환하여 응답
-                response_data = response_dto.model_dump()
+            # 유사도 체크
+            similarity_result = service.check_similarity(question_text)
 
 
-                # notion_url = similar.notion_page_url or os.getenv("NOTION_BOARD_URL", "")
+            if similarity_result['status'] == 'similar_found':
+                return Response(similarity_result['data'])
 
-                if similar_log.is_verified:
-                    response_data["status"] = "verified"
-                    return Response(response_data)
-                response_data["status"] = "duplicate"
-                return Response(response_data)
-
-
+            # 새로운 질문 처리
             new_log = service.process_question_flow(
                 question_text=question_text,
                 image=image

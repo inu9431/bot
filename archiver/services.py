@@ -1,5 +1,7 @@
+import base64
 import logging
 import re
+from unicodedata import category
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.files.uploadedfile import UploadedFile
@@ -7,8 +9,10 @@ from django.core.files.uploadedfile import UploadedFile
 from common import exceptions
 from .adapters import GeminiAdapter, NotionAdapter
 from .models import QnALog
-from common.exceptions import AIResponseParsingError, DatabaseOperationError
+from common.exceptions import AIResponseParsingError, DatabaseOperationError, ValidationError
 from typing import Optional
+from .adapters import qna_model_to_response_dto
+
 logger = logging.getLogger(__name__)
 
 
@@ -28,7 +32,7 @@ class QnAService:
         self.gemini = GeminiAdapter()
         self.notion = NotionAdapter()
 
-    def _check_similarity(self, question_text: str, threshold=0.6):
+    def check_similarity(self, question_text: str, threshold=0.6):
         """
         PostgreSQL의 pg_trgm을 사용하여 기존 질문들과 유사도 비교
         """
@@ -36,7 +40,7 @@ class QnAService:
 
         # 1. TrigramSimilarity를 사용하여 유사도 계산 및 필터링
 
-        similar_question = (
+        similar_log = (
             QnALog.objects.annotate(
                 similarity=TrigramSimilarity("question_text", question_text)
             )
@@ -45,64 +49,73 @@ class QnAService:
             .first()
         )
 
-        if similar_question:
-            logger.info(
-                f"유사 질문 발견: id={similar_question.id}, similarity={similar_question.similarity:.2f}"
-            )
-            return similar_question
 
-        logger.debug("유사 질문 없음 - 신규 질문으로 판정")
-        return None
+        if not similar_log:
+            return {
+                'status': 'not_found',
+                'data': None
+            }
+
+        # 검증된 질문인 경우
+        if similar_log.is_verified:
+            similar_log.hit_count += 1
+            similar_log.save(update_fields=["hit_count"])
+            logger.info(f" 유사 질문 발견 (검증됨): {similar_log.id}")
+        else:
+            logger.info(f" 유사 질문 발견 (검토 대기중): {similar_log.id}")
+
+        # DTO 변환
+        response_dto = qna_model_to_response_dto(similar_log)
+        response_data = response_dto.model_dump()
+
+        # status 추가
+        response_data["status"] = "similar_found"
+
+        return {
+           'status': 'similar_found',
+            'data': response_data
+        }
 
     def process_question_flow(self, question_text: str, image: Optional[UploadedFile] = None) -> QnALog:
         """
         이미 생성된 log_obj를 받아서 AI 분석 결과로 업데이트
         """
-        # 1. 유사도 체크 (기존 질문이 있는지)
         try:
+            if not question_text:
+                raise ValidationError("질문을 입력해주세요")
+
+            image_data = None
+            if image:
+                image_data = base64.b64encode(image.read()).decode('utf-8')
+
+            dto = self.gemini.generate_answer(question_text, image_data)
+
+
+
             log_obj = QnALog.objects.create(
                 question_text=question_text,
+                title=dto.title,
+                ai_answer=dto.ai_answer,
+                category=dto.category,
+                keywords=dto.keywords,
                 image=image,
-                title="AI 분석 중",
-                hit_count = 0
             )
-            logger.info(f"신규 질문 로그 생성됨 (ID: {log_obj.id})")
-        except Exception as e:
-            logger.error(f"QnALog 객체 생성 실패: {e}", exc_info=True)
-            raise DatabaseOperationError("질문 로그를 생성하는중 문제가 발생했습니다")
 
-        current_image_path = log_obj.image.path if log_obj.image else None
-
-
-        # 2. 신규 질문: AI 답변 생성 (GeminiAdapter 활용)
-        try:
-            prompt = self._build_analyze_prompt(question_text)
-            ai_answer = self.gemini.generate_answer(prompt, current_image_path)
-
-            if not ai_answer:
-                raise AIResponseParsingError("AI 답변 생성 실패")
-
-            parsed_data = self._parse_ai_response(ai_answer)
-
-            log_obj.title=parsed_data["title"]
-            log_obj.ai_answer=parsed_data["ai_answer"]
-            log_obj.category=parsed_data["category"]
-            log_obj.keywords=",".join(parsed_data["keywords"])
-            log_obj.save()
-
-            logger.info(f" 로그 업데이트 완료 id: {log_obj.id}")
             try:
-                self.notion.save_to_notion(log_obj)
-                logger.info(f"Notion 아카이빙 성공: {log_obj.id}")
+                notion_page_url = self.notion.create_qna_page(log_obj)
+                log_obj.notion_page_url = notion_page_url
+                log_obj.save(update_fields=["notion_page_url"])
+                logger.info(f"Notion 아카이빙 성공: {log_obj.id}, URL: {notion_page_url}")
             except Exception as e:
                 logger.error(f"Notion 저장 실패 ID: {log_obj.id}: {e}", exc_info=True)
 
             return log_obj
-            
+
         except (AttributeError, TypeError, IndexError) as e:
             logger.error(f"신규 질문 처리중 에러 발생 {e}")
-            log_obj.title = "AI 응답 파싱 실패"
-            log_obj.save()
+            if 'log_obj' in locals():
+                log_obj.title = "AI 응답 파싱 실패"
+                log_obj.save()
             raise AIResponseParsingError("AI 응답 형식(키워드, 제목)이 형식에 맞지않습니다")
         except AIResponseParsingError:
             raise
