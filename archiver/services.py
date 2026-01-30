@@ -49,7 +49,7 @@ class QnAService:
             .first()
         )
         similar_log = QnALog.objects.filter(
-            similariry__gt=0.7
+            similarity__gt=0.7
         ).annotate(
             similarity=TrigramSimilarity("question_text", question_text)
         ).order_bt('-similarity').first()
