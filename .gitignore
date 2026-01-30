@@ -28,3 +28,5 @@ db.sqlite3
 
 # OS
 .DS_Store
+repomix-output.xml
+dir/
