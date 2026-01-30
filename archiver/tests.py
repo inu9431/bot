@@ -34,17 +34,13 @@ def mock_gemini_adapter():
     """
     with patch("archiver.services.GeminiAdapter") as MockGemini:
         mock_instance = MockGemini.return_value
-        fake_ai_response = """
-        [메타데이터]
-        제목: AI가 생성한 테스트 제목
-        카테고리: Python
-        키워드: 테스트, pytest,django
-        
-        [출력양식]
-        (내용 생략)
-        """
-        mock_instance.generate_answer.return_value = fake_ai_response
-        yield mock_instance # 테스트 함수에 이 mock_instance 전달
+        mock_dto = MagicMock()
+        mock_dto.ai_answer = "테스트 AI 답변입니다"
+        mock_dto.category = "Python"
+        mock_dto.keywords = "테스트, pytest, django"
+        mock_dto.title = "AI가 생성한 테스트 제목"
+        mock_instance.generate_answer.return_value = mock_dto
+        yield mock_instance
 @pytest.fixture
 def mock_notion_adapter():
     """
@@ -53,8 +49,7 @@ def mock_notion_adapter():
     """
     with patch("archiver.services.NotionAdapter") as MockNotion:
         mock_instance = MockNotion.return_value
-
-        mock_instance.save_to_notion.return_value = "fake-notion-page-id-123"
+        mock_instance.create_qna_page.return_value = "https://notion.so/fake-page-123"
         yield mock_instance
         
 # ==================================================================================
@@ -94,7 +89,7 @@ class TestQnABotAPI:
         # 외부 서비스가 올바르게 호출되었는지 검증
         mock_gemini_adapter.generate_answer.assert_called_once()
 
-        mock_notion_adapter.save_to_notion.assert_called_once_with(created_log)
+        mock_notion_adapter.create_qna_page.assert_called_once_with(created_log)
 
     def test_ai_response_parsing_failure(self, api_client, qna_bot_url, mock_gemini_adapter, mock_notion_adapter):
         """
@@ -107,16 +102,16 @@ class TestQnABotAPI:
         response = api_client.post(qna_bot_url, request_data, format="json")
 
         assert response.status_code == 400
-        assert "AI 답변 생성 실패" in response.json()["error"]
+        assert "AI 응답 형식" in response.json()["error"]
 
-        mock_notion_adapter.save_to_notion.assert_not_called()
+        mock_notion_adapter.create_qna_page.assert_not_called()
 
 
     def test_notion_api_failure(self, api_client, qna_bot_url, mock_gemini_adapter, mock_notion_adapter):
         """
         [통합 테스트 성공] Notion 저장에 실패하더라도, 전체 흐름은 중단되지 않고 성공 응답을 반환하는지 검증
         """
-        mock_notion_adapter.save_to_notion.side_effect = Exception("Notion API 에러 발생")
+        mock_notion_adapter.create_qna_page.side_effect = Exception("Notion API 에러 발생")
         request_data = {"question_text": "Notion API 실패 테스트 질문"}
 
         response = api_client.post(qna_bot_url, request_data, format="json")
@@ -132,5 +127,5 @@ class TestQnABotAPI:
         assert log.title == "AI가 생성한 테스트 제목"
 
         mock_gemini_adapter.generate_answer.assert_called_once()
-        mock_notion_adapter.save_to_notion.assert_called_once()
+        mock_notion_adapter.create_qna_page.assert_called_once()
 

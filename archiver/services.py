@@ -40,7 +40,7 @@ class QnAService:
 
         # 1. TrigramSimilarity를 사용하여 유사도 계산 및 필터링
 
-        similar_question = (
+        similar_log = (
             QnALog.objects.annotate(
                 similarity=TrigramSimilarity("question_text", question_text)
             )
@@ -48,11 +48,8 @@ class QnAService:
             .order_by("-similarity")
             .first()
         )
-        similar_log = QnALog.objects.filter(
-            similarity__gt=0.7
-        ).annotate(
-            similarity=TrigramSimilarity("question_text", question_text)
-        ).order_bt('-similarity').first()
+
+
         if not similar_log:
             return {
                 'status': 'not_found',
@@ -95,11 +92,12 @@ class QnAService:
 
 
 
-            log_obj =QnALog.objects.create(
+            log_obj = QnALog.objects.create(
                 question_text=question_text,
-                answer_text=dto.ai_answer,
+                title=dto.title,
+                ai_answer=dto.ai_answer,
                 category=dto.category,
-                tags=dto.tags,
+                keywords=dto.keywords,
                 image=image,
             )
 
