@@ -11,7 +11,6 @@ class QnACreateDTO(BaseModel):
 
     question_text: str
     title: str
-    summary: Optional[str] = None
     reason: Optional[str] = None
     solution_code: Optional[str] = None
     checkpoint: Optional[str] = None
@@ -29,7 +28,6 @@ class QnAResponseDTO(BaseModel):
         id: int
         question_text: str
         title: str
-        summary: Optional[str] = None
         reason: Optional[str] = None
         solution_code: Optional[str] = None
         checkpoint: Optional[str] = None

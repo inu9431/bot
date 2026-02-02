@@ -4,20 +4,8 @@ from django_q.tasks import async_task
 
 
 class QnALog(models.Model):
-    CATEGORY_CHOICES = [
-        ("Git", "Git"),
-        ("Linux", "Linux"),
-        ("DB", "DB"),
-        ("Python", "Python"),
-        ("Flask", "Flask"),
-        ("Django", "Django"),
-        ("FastAPI", "FastAPI"),
-        ("General", "General"),
-    ]
-
     category = models.CharField(
         max_length=50,
-        choices=CATEGORY_CHOICES,
         default="General",
         verbose_name="카테고리",
     )
