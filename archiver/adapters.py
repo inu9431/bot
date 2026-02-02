@@ -1,8 +1,8 @@
 import logging
 import os
 import re
-from typing import List, Optional
-
+from typing import List, Optional, Union
+from common.constants import NOTION_CATEGORIES
 import google.genai as genai
 import requests
 from django.conf import settings
@@ -16,28 +16,37 @@ logger = logging.getLogger(__name__)
 
 
 def create_qna_dto_from_ai_response(
-question_text: str,
+    question_text: str,
     ai_raw_text: str,
-    category: Optional[str] = None,
-    keywords: Optional[List[str]] = None,
     image_path: Optional[str] = None,
 ) -> QnACreateDTO:
-    """
-    AI의 원본 응답 텍스트를 파싱하여 QnACreateDTO 객체를 생성합니다
-    """
+    """AI의 원본 응답 텍스트를 파싱하여 QnACreateDTO 객체를 생성합니다"""
+
+    # 제목 추출
     title_match = re.search(r"제목:\s*(.*)", ai_raw_text)
     title = title_match.group(1).strip() if title_match else "신규 질문"
 
-    # summary는 첫 200자 정도 추출
-    summary = ai_raw_text.strip()[:200] if ai_raw_text else None
+    # 카테고리 추출
+    category_match = re.search(r"카테고리:\s*(.*)", ai_raw_text)
+    category = "General"
+    if category_match:
+        cat_text = category_match.group(1).strip()
+        for cat in NOTION_CATEGORIES:
+            if cat.lower() in cat_text.lower():
+                category = cat
+                break
+
+    # 키워드 추출
+    keywords_match = re.search(r"키워드:\s*(.*?)(?=\n|\[|$)", ai_raw_text, re.DOTALL)
+    keywords = []
+    if keywords_match:
+        keywords = [k.strip() for k in keywords_match.group(1).split(",") if k.strip()]
 
     return QnACreateDTO(
         question_text=question_text,
         title=title,
-        summary=summary,
-        # reason, solution_code 등은 이 단계에서는 없으므로 None으로 둡니다.
-        category=category or "General",
-        keywords=keywords or [],
+        category=category,
+        keywords=keywords,
         image_path=image_path,
         ai_answer=ai_raw_text,
         hit_count=1,
@@ -76,8 +85,29 @@ class GeminiAdapter:
                 genai.configure(api_key=api_key)
             GeminiAdapter._client_configured = True
 
-    def generate_answer(self, prompt: str, image_path: Optional[str] = None) -> str:
+    def _build_prompt(self, question_text: str) -> str:
+        """AI에게 보낼 프롬프트를 구성합니다"""
+        return f"""                                                                                                                                                           
+        너는 불필요한 설명을 하지 않는 실력파 개발 조교야.                                                                                                                    
+        인사말은 생략하고 다음 구조로 핵심만 짧게 답해줘.                                                                                                                     
+        [메타데이터]                                                                                                                                                          
+        제목: (질문의 핵심 의도를 한문장으로)                                                                                                                                 
+        카테고리: (다음중 하나 선택 - {",".join(NOTION_CATEGORIES)})                                                                                                     
+        키워드: (핵심 키워드 3개를 쉼표로 구분)                                                                                                                               
+
+        [출력 양식]                                                                                                                                                           
+        제목: (질문의 핵심 의도를 한 문장으로 요약)                                                                                                                           
+        1. **문제 요약**: (에러 정체 1문장)                                                                                                                                   
+        2. **핵심 원인**: (이유 1~2개 불렛 포인트)                                                                                                                            
+        3. **해결 코드**: (중요 코드 블록. 설명은 주석으로)                                                                                                                   
+        4. **체크포인트**: (실수 방지 팁 하나)                                                                                                                                
+
+        질문 내용: {question_text}                                                                                                                                            
+        """
+
+    def generate_answer(self, question_text: str, image_path: Optional[str] = None) -> QnACreateDTO:
         self._setup_client()
+
 
         content_parts = []
         if image_path and os.path.exists(image_path):
@@ -87,7 +117,7 @@ class GeminiAdapter:
                 logger.info(f"이미지 로딩 성공 {image_path}")
             except Exception as e:
                 logger.warning(f"이미지 로딩 에러 (경로 {image_path}): {e}")
-
+        prompt = self._build_prompt(question_text)
         content_parts.append(prompt)
 
         try:
@@ -114,7 +144,10 @@ class GeminiAdapter:
                 logger.warning(f"Gemini 응답이 비어있음 이유: {finish_reason}")
                 raise LLMServiceError("AI 응답이 비어있습니다")
 
-            return response.text
+            return create_qna_dto_from_ai_response(
+                question_text=question_text,
+                ai_raw_text =response.text
+            )
 
         except Exception as e:
             if isinstance(e, LLMServiceError):
@@ -147,7 +180,7 @@ class NotionAdapter:
             "Notion-Version": "2022-06-28",
         }
 
-    def create_qna_page(self, dto: QnACreateDTO) -> str:
+    def create_qna_page(self, dto: Union[QnACreateDTO, QnALog]) -> str:
         """DTO를 받아서 노션 페이지를 생성하고 생성된 페이지 URL 반환"""
         properties = {
             "이름": {"title": [{"text": {"content": (dto.title or "질문")[:100]}}]},

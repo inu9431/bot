@@ -3,8 +3,6 @@ from django.test import TestCase
 from django.urls import reverse
 from unittest.mock import patch, MagicMock
 
-from google.genai.tests.client.test_async_stream import responses
-
 from .models import QnALog
 from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
 @pytest.fixture
