@@ -47,88 +47,88 @@ jobs:
       - name: Run tests
         run: uv run pytest -v
 
-  # 2. CD 단계: 도커 허브 빌드 및 EC2 배포
-  deploy:
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/qnabot:latest
-            ${{ secrets.DOCKER_USERNAME }}/qnabot:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
-          NOTION_BOARD_URL: ${{ secrets.NOTION_BOARD_URL }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          envs: DOCKER_USERNAME,DOCKER_PASSWORD,SECRET_KEY,ALLOWED_HOSTS,DISCORD_BOT_TOKEN,GEMINI_API_KEY,NOTION_TOKEN,NOTION_DB_ID,NOTION_BOARD_URL,DB_HOST,DB_NAME,DB_USER,DB_PASSWORD
-          script: |
-            set -e
-            cd /home/ubuntu/bot
-            
-            git fetch origin main
-            git reset --hard origin/main
-            
-            # .env 생성 (쉘 환경변수 사용)
-            echo "DEBUG=False" > .env
-            echo "SECRET_KEY=${SECRET_KEY}" >> .env
-            echo "ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> .env
-            echo "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}" >> .env
-            echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> .env
-            echo "NOTION_TOKEN=${NOTION_TOKEN}" >> .env
-            echo "NOTION_DB_ID=${NOTION_DB_ID}" >> .env
-            echo "NOTION_BOARD_URL=${NOTION_BOARD_URL}" >> .env
-            echo "DB_HOST=${DB_HOST}" >> .env
-            echo "DB_PORT=5432" >> .env
-            echo "DB_NAME=${DB_NAME}" >> .env
-            echo "DB_USER=${DB_USER}" >> .env
-            echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
-            echo "DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}" >> .env
-            echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> .env
-
-            # Docker Hub 로그인 및 최신 이미지 Pull
-            sudo docker system prune -a -f
-            sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml pull
-            # 마이그레이션 실행
-            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml run --rm web python manage.py migrate
-            # 컨테이너 재시작
-            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml down
-            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml up -d --no-build
-            
-            sudo docker image prune -f
-            echo "🎉 배포 성공!"
+#  # 2. CD 단계: 도커 허브 빌드 및 EC2 배포
+#  deploy:
+#    needs: build-and-test
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: .
+#          push: true
+#          tags: |
+#            ${{ secrets.DOCKER_USERNAME }}/qnabot:latest
+#            ${{ secrets.DOCKER_USERNAME }}/qnabot:${{ github.sha }}
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+#
+#      - name: Deploy to EC2 via SSH
+#        uses: appleboy/ssh-action@v1.0.3
+#        env:
+#          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+#          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+#          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+#          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+#          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+#          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+#          NOTION_BOARD_URL: ${{ secrets.NOTION_BOARD_URL }}
+#          DB_HOST: ${{ secrets.DB_HOST }}
+#          DB_NAME: ${{ secrets.DB_NAME }}
+#          DB_USER: ${{ secrets.DB_USER }}
+#          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ubuntu
+#          key: ${{ secrets.EC2_KEY }}
+#          envs: DOCKER_USERNAME,DOCKER_PASSWORD,SECRET_KEY,ALLOWED_HOSTS,DISCORD_BOT_TOKEN,GEMINI_API_KEY,NOTION_TOKEN,NOTION_DB_ID,NOTION_BOARD_URL,DB_HOST,DB_NAME,DB_USER,DB_PASSWORD
+#          script: |
+#            set -e
+#            cd /home/ubuntu/bot
+#
+#            git fetch origin main
+#            git reset --hard origin/main
+#
+#            # .env 생성 (쉘 환경변수 사용)
+#            echo "DEBUG=False" > .env
+#            echo "SECRET_KEY=${SECRET_KEY}" >> .env
+#            echo "ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> .env
+#            echo "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}" >> .env
+#            echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> .env
+#            echo "NOTION_TOKEN=${NOTION_TOKEN}" >> .env
+#            echo "NOTION_DB_ID=${NOTION_DB_ID}" >> .env
+#            echo "NOTION_BOARD_URL=${NOTION_BOARD_URL}" >> .env
+#            echo "DB_HOST=${DB_HOST}" >> .env
+#            echo "DB_PORT=5432" >> .env
+#            echo "DB_NAME=${DB_NAME}" >> .env
+#            echo "DB_USER=${DB_USER}" >> .env
+#            echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+#            echo "DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}" >> .env
+#            echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> .env
+#
+#            # Docker Hub 로그인 및 최신 이미지 Pull
+#            sudo docker system prune -a -f
+#            sudo docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+#            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml pull
+#            # 마이그레이션 실행
+#            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml run --rm web python manage.py migrate
+#            # 컨테이너 재시작
+#            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml down
+#            sudo -E DOCKER_USERNAME=${DOCKER_USERNAME} docker compose -f docker-compose.prod.yml up -d --no-build
+#
+#            sudo docker image prune -f
+#            echo "🎉 배포 성공!"
