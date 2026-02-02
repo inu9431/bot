@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import io
 from typing import List, Optional, Union
 from common.constants import NOTION_CATEGORIES
 import google.genai as genai
@@ -105,18 +106,18 @@ class GeminiAdapter:
         질문 내용: {question_text}                                                                                                                                            
         """
 
-    def generate_answer(self, question_text: str, image_path: Optional[str] = None) -> QnACreateDTO:
+    def generate_answer(self, question_text: str, image_data: Optional[bytes] = None) -> QnACreateDTO:
         self._setup_client()
 
 
         content_parts = []
-        if image_path and os.path.exists(image_path):
+        if image_data:
             try:
-                img = Image.open(image_path)
+                img = Image.open(io.BytesIO(image_data))
                 content_parts.append(img)
-                logger.info(f"이미지 로딩 성공 {image_path}")
+                logger.info("이미지 로딩 성공")
             except Exception as e:
-                logger.warning(f"이미지 로딩 에러 (경로 {image_path}): {e}")
+                logger.warning(f"이미지 로딩 에러: {e}")
         prompt = self._build_prompt(question_text)
         content_parts.append(prompt)
 

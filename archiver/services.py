@@ -1,6 +1,4 @@
-import base64
 import logging
-from unicodedata import category
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.files.uploadedfile import UploadedFile
@@ -70,7 +68,7 @@ class QnAService:
 
             image_data = None
             if image:
-                image_data = base64.b64encode(image.read()).decode('utf-8')
+                image_data = image.read()
 
             dto = self.gemini.generate_answer(question_text, image_data)
 
