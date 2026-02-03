@@ -158,7 +158,7 @@ class GeminiAdapter:
             # 힐당량 초과 및 기타 에러 핸들링
             if "quota" in msg or "rate" in msg:
                 logger.warning(f" Quota/Rate limit error {e}")
-                raise LLMServiceError("API 할달향 초과, 나중에 재시도하세여")
+                raise LLMServiceError("API 할달량 초과, 나중에 재시도하세여")
             logger.error(f"Gemini API 에러 {e}", exc_info=True)
             # 더이상 클라이언트 미지원 에러를 던지지말고 실제 발생 에러를 전달
             raise LLMServiceError(f"AI 응답 생성 실패: {str(e)}")
