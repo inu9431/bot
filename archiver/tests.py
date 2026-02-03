@@ -1,9 +1,11 @@
 import pytest
 from django.test import TestCase
 from django.urls import reverse
-from unittest.mock import patch, MagicMock
-
+from unittest.mock import patch, MagicMock, Mock
+from .services import QnAService
 from .models import QnALog
+from .dto import QnACreateDTO
+from .tasks import task_process_question
 from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
 @pytest.fixture
 def qna_bot_api_url():
@@ -126,4 +128,143 @@ class TestQnABotAPI:
 
         mock_gemini_adapter.generate_answer.assert_called_once()
         mock_notion_adapter.create_qna_page.assert_called_once()
+@pytest.fixture
+def mock_qna_service():
+    """Mock된 QnAService 인스턴스를 제공하는 Fixture"""
+    with patch.object(QnAService, '__init__', lambda x: None):
+        service = QnAService()
+        service.gemini = MagicMock()
+        service.notion = MagicMock()
+        yield service
+
+
+@pytest.mark.django_db
+class TestCheckSimilarity:
+    """유사 질문 검색 기능 테스트"""
+    def test_returns_not_found_when_no_similar_question(self, mock_qna_service):
+        """유사 질문이 없으면 not_found 반환"""
+        result = mock_qna_service.check_similarity("완전히 새로운 질문입니다")
+
+        assert result["status"] == "not_found"
+        assert result["data"] is None
+
+
+    def test_returns_similar_found_and_increments_hit_count(self, mock_qna_service):
+        """Given 검증된 기존 질문이 있음"""
+        existing = QnALog.objects.create(
+            question_text = "Django ORM 사용법",
+            title = "Django ORM",
+            ai_answer = "ORM 사용법 답변",
+            is_verified = True,
+            hit_count = 5,
+        )
+
+        result = mock_qna_service.check_similarity("Django ORM 어떻게 사용하나요")
+
+        assert result["status"] == "not_found"
+        existing.refresh_from_db()
+        assert existing.hit_count == 5
+
+@pytest.mark.django_db
+class TestProcessQuestionFlow:
+    """신규 질문 처리 플로우 테스트"""
+
+    def test_creates_qna_log_with_ai_response(self, mock_qna_service):
+        """AI 응답을 받아 QnALog 반환값 설정"""
+        mock_dto = MagicMock()
+        mock_dto.title = "pytest 기본 사용법"
+        mock_dto.category = "Python"
+        mock_dto.keywords = ["pytest", "테스트", "TDD"]
+        mock_dto.ai_answer = "pytest는 Python 테스트 프레임워크입니다"
+
+        mock_qna_service.gemini.generate_answer.return_value = mock_dto
+        mock_qna_service.notion.create_qna_page.return_value = "https://notion.so/page-123"
+
+        result = mock_qna_service.process_question_flow("pytest 사용법")
+
+        assert result.title == "pytest 기본 사용법"
+        assert result.notion_page_url == "https://notion.so/page-123"
+        mock_qna_service.gemini.generate_answer.assert_called_once()
+
+    def test_raises_validation_error_when_empty_question(self, mock_qna_service):
+        """빈 질문일떄 ValidationError 발생"""
+        with pytest.raises(ValidationError, match="질문을 입력해주세요"):
+            mock_qna_service.process_question_flow("")
+
+class TestCreateQnaDtoFromAiResponse:
+    """AI 응답 파싱 기능 테스트"""
+    def test_parses_complete_ai_response(self):
+        """제목, 카테고리, 키워드 포함된 AI 응답 파싱"""
+        from .adapters import create_qna_dto_from_ai_response
+
+        ai_response = """제목: Django ORM 최적화 방법
+
+    카테고리: Django
+    키워드: ORM, 쿼리셋, N + 1
+
+    1. ** 문제
+    요약 **: 쿼리
+    성능
+    저하
+    2. ** 핵심
+    원인 **: N + 1
+    문제
+    발생
+    3. ** 해결
+    코드 **: select_related
+    사용
+    """
+        result = create_qna_dto_from_ai_response(
+            question_text="Django ORM 최적화 어떻게 하나요?",
+            ai_raw_text=ai_response
+        )
+
+        assert result.title == "Django ORM 최적화 방법"
+        assert result.category == "Django"
+        assert result.keywords == ["ORM", "쿼리셋", "N + 1"]
+        assert result.question_text == "Django ORM 최적화 어떻게 하나요?"
+
+    def test_uses_defaults_when_fields_missing(self):
+        """필드가 없을떄 기본값 사용"""
+        from .adapters import create_qna_dto_from_ai_response
+
+        ai_response = "그냥 답변만 있는 텍스트입니다"
+
+        result = create_qna_dto_from_ai_response(
+            question_text="질문입니다",
+            ai_raw_text=ai_response
+        )
+
+        assert result.title == "신규 질문"
+        assert result.category == "General"
+        assert result.keywords == []
+
+class TestTaskProcessQuestion:
+    """Task_process_question 비동기 태스크 테스트"""
+
+    @pytest.fixture
+    def sample_qna_log(self, db):
+        """테스트용 QnALog 생성"""
+        return QnALog.objects.create(
+        question_text="테스트 질문",
+        ai_answer = "테스트 응답",
+        parent_question= None
+        )
+
+    @patch('archiver.tasks.logger')
+    @patch('archiver.tasks.NotionAdapter')
+    @patch('archiver.tasks.qna_model_to_create_dto')
+    def test_successfully_creates_notion_page_and_saves_url(self, mock_qna_dto_converter, mock_adapter_class, mock_logger, sample_qna_log ):
+        """노션 페이지 생성 성공시 URL을 저장"""
+        mock_dto = Mock()
+        mock_qna_dto_converter.return_value = mock_dto
+
+        mock_adapter = Mock()
+        mock_adapter.create_qna_page.return_value = "https://notion.so/test-page"
+        mock_adapter_class.return_value = mock_adapter
+
+        task_process_question(sample_qna_log.id)
+
+        mock_logger.info.assert_called_once()
+        assert "노션 업로드 완료" in mock_logger.info.call_args[0][0]
 

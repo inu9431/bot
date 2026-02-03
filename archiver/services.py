@@ -101,6 +101,8 @@ class QnAService:
             raise AIResponseParsingError("AI 응답 형식(키워드, 제목)이 형식에 맞지않습니다")
         except AIResponseParsingError:
             raise
+        except ValidationError:
+            raise
         except Exception as e:
             logger.error(f"데이터베이스 저장 중 오류 발생: {e}", exc_info=True)
             raise DatabaseOperationError("결과를 데이터베이스에 저장하는 중 문제가 발생했습니다")
