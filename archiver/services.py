@@ -1,6 +1,4 @@
-import base64
 import logging
-from unicodedata import category
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.files.uploadedfile import UploadedFile
@@ -70,7 +68,7 @@ class QnAService:
 
             image_data = None
             if image:
-                image_data = base64.b64encode(image.read()).decode('utf-8')
+                image_data = image.read()
 
             dto = self.gemini.generate_answer(question_text, image_data)
 
@@ -102,6 +100,8 @@ class QnAService:
                 log_obj.save()
             raise AIResponseParsingError("AI 응답 형식(키워드, 제목)이 형식에 맞지않습니다")
         except AIResponseParsingError:
+            raise
+        except ValidationError:
             raise
         except Exception as e:
             logger.error(f"데이터베이스 저장 중 오류 발생: {e}", exc_info=True)

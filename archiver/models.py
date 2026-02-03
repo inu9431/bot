@@ -49,7 +49,7 @@ class QnALog(models.Model):
         ]
 
     def __str__(self):
-        return f"[{self.category}] {self.title}] (빈도: {self.hit_count})"
+        return f"[{self.category}] {self.title} (빈도: {self.hit_count})"
 
     # 검증되고 노션 url이 없는 경우에만 워커 호출
     def save(self, *args, **kwargs):

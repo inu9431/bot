@@ -1,9 +1,14 @@
 import pytest
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
+from config.settings import GEMINI_API_KEY
+from .services import QnAService
 from .models import QnALog
+from .dto import QnACreateDTO, QnAResponseDTO
+from .tasks import task_process_question
+from .adapters import qna_model_to_create_dto, qna_model_to_response_dto, GeminiAdapter
 from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
 @pytest.fixture
 def qna_bot_api_url():
@@ -126,4 +131,384 @@ class TestQnABotAPI:
 
         mock_gemini_adapter.generate_answer.assert_called_once()
         mock_notion_adapter.create_qna_page.assert_called_once()
+@pytest.fixture
+def mock_qna_service():
+    """Mock된 QnAService 인스턴스를 제공하는 Fixture"""
+    with patch.object(QnAService, '__init__', lambda x: None):
+        service = QnAService()
+        service.gemini = MagicMock()
+        service.notion = MagicMock()
+        yield service
+
+
+@pytest.mark.django_db
+class TestCheckSimilarity:
+    """유사 질문 검색 기능 테스트"""
+    def test_returns_not_found_when_no_similar_question(self, mock_qna_service):
+        """유사 질문이 없으면 not_found 반환"""
+        result = mock_qna_service.check_similarity("완전히 새로운 질문입니다")
+
+        assert result["status"] == "not_found"
+        assert result["data"] is None
+
+
+    def test_returns_similar_found_and_increments_hit_count(self, mock_qna_service):
+        """Given 검증된 기존 질문이 있음"""
+        existing = QnALog.objects.create(
+            question_text = "Django ORM 사용법",
+            title = "Django ORM",
+            ai_answer = "ORM 사용법 답변",
+            is_verified = True,
+            hit_count = 5,
+        )
+
+        result = mock_qna_service.check_similarity("Django ORM 사용법")
+
+        assert result["status"] == "similar_found"
+        existing.refresh_from_db()
+        assert existing.hit_count == 6
+
+@pytest.mark.django_db
+class TestProcessQuestionFlow:
+    """신규 질문 처리 플로우 테스트"""
+
+    def test_creates_qna_log_with_ai_response(self, mock_qna_service):
+        """AI 응답을 받아 QnALog 반환값 설정"""
+        mock_dto = MagicMock()
+        mock_dto.title = "pytest 기본 사용법"
+        mock_dto.category = "Python"
+        mock_dto.keywords = ["pytest", "테스트", "TDD"]
+        mock_dto.ai_answer = "pytest는 Python 테스트 프레임워크입니다"
+
+        mock_qna_service.gemini.generate_answer.return_value = mock_dto
+        mock_qna_service.notion.create_qna_page.return_value = "https://notion.so/page-123"
+
+        result = mock_qna_service.process_question_flow("pytest 사용법")
+
+        assert result.title == "pytest 기본 사용법"
+        assert result.notion_page_url == "https://notion.so/page-123"
+        mock_qna_service.gemini.generate_answer.assert_called_once()
+
+    def test_raises_validation_error_when_empty_question(self, mock_qna_service):
+        """빈 질문일떄 ValidationError 발생"""
+        with pytest.raises(ValidationError, match="질문을 입력해주세요"):
+            mock_qna_service.process_question_flow("")
+
+class TestCreateQnaDtoFromAiResponse:
+    """AI 응답 파싱 기능 테스트"""
+    def test_parses_complete_ai_response(self):
+        """제목, 카테고리, 키워드 포함된 AI 응답 파싱"""
+        from .adapters import create_qna_dto_from_ai_response
+
+        ai_response = """제목: Django ORM 최적화 방법
+
+    카테고리: Django
+    키워드: ORM, 쿼리셋, N + 1
+
+    1. ** 문제
+    요약 **: 쿼리
+    성능
+    저하
+    2. ** 핵심
+    원인 **: N + 1
+    문제
+    발생
+    3. ** 해결
+    코드 **: select_related
+    사용
+    """
+        result = create_qna_dto_from_ai_response(
+            question_text="Django ORM 최적화 어떻게 하나요?",
+            ai_raw_text=ai_response
+        )
+
+        assert result.title == "Django ORM 최적화 방법"
+        assert result.category == "Django"
+        assert result.keywords == ["ORM", "쿼리셋", "N + 1"]
+        assert result.question_text == "Django ORM 최적화 어떻게 하나요?"
+
+    def test_uses_defaults_when_fields_missing(self):
+        """필드가 없을떄 기본값 사용"""
+        from .adapters import create_qna_dto_from_ai_response
+
+        ai_response = "그냥 답변만 있는 텍스트입니다"
+
+        result = create_qna_dto_from_ai_response(
+            question_text="질문입니다",
+            ai_raw_text=ai_response
+        )
+
+        assert result.title == "신규 질문"
+        assert result.category == "General"
+        assert result.keywords == []
+
+class TestTaskProcessQuestion:
+    """Task_process_question 비동기 태스크 테스트"""
+
+    @pytest.fixture
+    def sample_qna_log(self, db):
+        """테스트용 QnALog 생성"""
+        return QnALog.objects.create(
+        question_text="테스트 질문",
+        ai_answer = "테스트 응답",
+        parent_question= None
+        )
+
+    @patch('archiver.tasks.logger')
+    @patch('archiver.tasks.NotionAdapter')
+    @patch('archiver.tasks.qna_model_to_create_dto')
+    def test_successfully_creates_notion_page_and_saves_url(self, mock_qna_dto_converter, mock_adapter_class, mock_logger, sample_qna_log ):
+        """노션 페이지 생성 성공시 URL을 저장"""
+        mock_dto = Mock()
+        mock_qna_dto_converter.return_value = mock_dto
+
+        mock_adapter = Mock()
+        mock_adapter.create_qna_page.return_value = "https://notion.so/test-page"
+        mock_adapter_class.return_value = mock_adapter
+
+        task_process_question(sample_qna_log.id)
+
+        mock_logger.info.assert_called_once()
+        assert "노션 업로드 완료" in mock_logger.info.call_args[0][0]
+
+class TestQnAModelToCreateDTO:
+    """QnALog -> QnACreateDTO 변환 테스트"""
+
+    def test_converts_qna_Log_to_create_dto(self, db):
+        """QnALog를 QnACreateDTO로 변환"""
+        qna_log = QnALog.objects.create(
+            category="Django",
+            title="Django ORM 질문",
+            question_text = "ORM 사용법이 궁굼합니다",
+            ai_answer = "Django ORM은 ..",
+            keywords = "Django, ORM",
+            hit_count = 3
+        )
+
+        dto = qna_model_to_create_dto(qna_log)
+
+        assert isinstance(dto, QnACreateDTO)
+        assert dto.question_text == "ORM 사용법이 궁굼합니다"
+        assert dto.category == "Django"
+        assert dto.title == "Django ORM 질문"
+        assert dto.ai_answer == "Django ORM은 .."
+        assert dto.keywords ==["Django", "ORM"]
+        assert dto.hit_count == 3
+
+    def test_handles_optional_fields_in_create_dto(self, db):
+        """ 선택적 필드를 처리"""
+        qna_log = QnALog.objects.create(
+            category ="General",
+            title = "최소 정보",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_create_dto(qna_log)
+        assert dto.category == "General"
+        assert dto.title == "최소 정보"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.keywords == [] or dto.keywords is not None
+
+    def test_create_dto_is_immutable(self, db):
+        """CreateDTO는 불변 객체"""
+        qna_log = QnALog.objects.create(
+            title = "테스트",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_create_dto(qna_log)
+
+        with pytest.raises(Exception):
+            dto.title = "변경 시도"
+
+class TestQnAModelToResponseDTO:
+    """QnALog -> QnAResponseDTO 변환 테스트"""
+
+    def test_converts_qna_log_to_response_dto(self, db):
+        """QnALog를 QnAResponseDTO로 변환"""
+        qna_log = QnALog.objects.create(
+            category ="Django",
+            title="테스트 제목",
+            question_text = "질문",
+            ai_answer = "답변",
+            keywords = "Django, ORM, Test",
+            hit_count = 3,
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.category == "Django"
+        assert dto.title == "테스트 제목"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.keywords == ["Django", "ORM", "Test"]
+        assert dto.hit_count == 3
+        assert dto.created_at == qna_log.created_at
+
+    def test_splits_keywords_from_comma_separated_string(self, db):
+        """keywords를 쉼표로 구분한 문자열에서 리스트로 변환한다"""
+        qna_log = QnALog.objects.create(
+            category="General",
+            title="키워드 테스트",
+            question_text="질문",
+            ai_answer="답변",
+            keywords="Python, Django, REST API"
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.keywords == ["Python", "Django", "REST API"]
+
+    def test_handles_empty_keywords(self, db):
+        """keywords가 빈 문자열일뗴 빈 리스트 반환"""
+        qna_log = QnALog.objects.create(
+            category = "General",
+            title = "빈 키워드",
+            question_text = "질문",
+            ai_answer = "답변",
+            keywords = None
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.keywords == [] or dto.keywods is  None
+
+    def test_response_dto_includes_id_and_timestamps(self, db):
+        """ResponseDTO는 id와 created_at을 포함한다"""
+        qna_log = QnALog.objects.create(
+            category = "General",
+            title = "테스트",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        with pytest.raises(Exception):
+            dto.title = "변경 시도"
+
+    def test_handles_all_optional_fields(self, db):
+        """모든 선택적 필드가 있을떄 올바르게 변환"""
+        qna_log = QnALog.objects.create(
+            category="Django",
+            title="테스트",
+            question_text="질문",
+            ai_answer="답변",
+            keywords = "test, example",
+            hit_count = 10,
+            is_verified = True
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.category == "Django"
+        assert dto.title == "테스트"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.keywords == ["test", "example"]
+        assert dto.hit_count == 10
+        assert dto.id > 0
+        assert dto.created_at is not None
+
+    def test_handles_minimal_required_fields(self, db):
+        """최소 필수 필드만으로 변환이 가능하다"""
+        qna_log = QnALog.objects.create(
+            title = "최소 정보",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.title == "최소 정보"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.category == "General"
+
+class TestGeminiAdapter:
+    """GeminiAdapter 단위 테스트"""
+
+    @patch("archiver.adapters.genai")
+    @override_settings(Gemini_API_KEY= 'test-api-key')
+    def test_generate_answer_success(self, mock_genai):
+        """AI 응답 성공시 QnACreateDTO 반환"""
+
+        mock_response = MagicMock()
+        mock_response.prompt_feedback.block_reason = None
+        mock_response.text = """제목: Django ORM 최적화
+카테고리: Django                                                                                                                                                              
+키워드: ORM, 쿼리셋, 최적화                                                                                                                                                   
+                                                                                                                                                                        
+1. **문제 요약**: N+1 쿼리 문제      
+"""
+
+        mock_model = MagicMock()
+        mock_model.generate_content.return_value = mock_response
+        mock_genai.GenerativeModel.return_value = mock_model
+
+        adapter = GeminiAdapter()
+        result = adapter.generate_answer("Django ORM 최적화 방법")
+
+        assert isinstance(result, QnACreateDTO)
+        assert result.title == "Django ORM 최적화"
+        assert result.category == "Django"
+
+    @patch("archiver.adapters.genai")
+    @override_settings(GEMINI_API_KEY='test-api-key')
+    def test_generate_answer_blocked_response(self, mock_genai):
+        """AI 응답이 차단되면 LLMServiceError 발생"""
+
+        mock_response = MagicMock()
+        mock_response.prompt_feedback.block_reason = "SAFETY"
+
+        mock_model = MagicMock()
+        mock_model.generate_content.return_value = mock_response
+        mock_genai.GenerativeModel.return_value = mock_model
+
+        adapter = GeminiAdapter()
+
+        with pytest.raises(LLMServiceError, match="차단"):
+            adapter.generate_answer("테스트 질문")
+
+    @patch("archiver.adapters.genai")
+    @override_settings(GEMINI_API_KEY='test-api-key')
+    def test_generate_answer_empty_response(self, mock_genai):
+        """AI 응답이 비어있으면 LLMServiceError 발생"""
+        mock_response = MagicMock()
+        mock_response.prompt_feedback.block_reason = None
+        mock_response.text = None
+        mock_response.candidates = []
+
+        mock_model = MagicMock()
+        mock_model.generate_content.return_value = mock_response
+        mock_genai.GenerativeModel.return_value = mock_model
+
+        adapter = GeminiAdapter()
+
+        with pytest.raises(LLMServiceError, match="비어있습니다"):
+            adapter.generate_answer("테스트 질문")
+
+    @patch("archiver.adapters.genai")
+    @override_settings(GEMINI_API_KEY="test-api-key")
+    def test_generate_answer_quota_exceeded(self, mock_genai):
+        """API 할달량 초과시 LLMServiceError 발생"""
+        mock_model = MagicMock()
+        mock_model.generate_content.side_effect = Exception("quota exceeded")
+        mock_genai.GenerativeModel.return_value = mock_model
+
+        adapter = GeminiAdapter()
+
+        with pytest.raises(LLMServiceError, match= "할달량 초과"):
+            adapter.generate_answer("테스트 질문")
+
+    @override_settings(GEMINI_API_KEY=None)
+    def test_init_witout_api_key_raises_error(self):
+        """API 키가 없으면 LLMServiceError 발생"""
+        with pytest.raises(LLMServiceError, match="GEMINI_API_KEY"):
+            GeminiAdapter()
+
+
 

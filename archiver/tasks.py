@@ -23,12 +23,12 @@ def task_process_question(log_id):
         if notion_url:
             log.notion_page_url = notion_url
             log.save(update_fields=["notion_page_url"])
-            logger.info(f" [worker] 노션 업로드 완료 (ID: {log.id}")
+            logger.info(f"[worker] 노션 업로드 완료 (ID: {log.id})")
     except QnALog.DoesNotExist:
-        logger.error(f"[worker] 해당 ID의 로그를 찾을 수 없음 (ID: {log_id}")
+        logger.error(f"[worker] 해당 ID의 로그를 찾을 수 없음 (ID: {log_id})")
         #복구할수 없으므로 재시도하지 않도록 예외 처리
     except Exception as e:
-        logger.error(f" [worker] 노션 업로드 실패 (ID: {log_id} : {str(e)}")
+        logger.error(f"[worker] 노션 업로드 실패 (ID: {log_id}): {str(e)}")
         # 실패시 예외를 다시 던져서 django-q가  실패로그를 남김
         raise e
 
