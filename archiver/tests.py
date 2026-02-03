@@ -1,15 +1,15 @@
 import pytest
+import requests
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from unittest.mock import patch, MagicMock, Mock
-
-from config.settings import GEMINI_API_KEY
+from config.settings import GEMINI_API_KEY, NOTION_DB_ID
 from .services import QnAService
 from .models import QnALog
 from .dto import QnACreateDTO, QnAResponseDTO
 from .tasks import task_process_question
-from .adapters import qna_model_to_create_dto, qna_model_to_response_dto, GeminiAdapter
-from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
+from .adapters import qna_model_to_create_dto, qna_model_to_response_dto, GeminiAdapter, NotionAdapter
+from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError, NotionAPIError
 @pytest.fixture
 def qna_bot_api_url():
     """API 엔드포인트 URL을 제공하는 Fixture"""
@@ -511,4 +511,88 @@ class TestGeminiAdapter:
             GeminiAdapter()
 
 
+
+class TestNotionAdapter:
+    """NotionAdapter 단위 테스트"""
+
+    @patch("archiver.adapters.requests.post")
+    @override_settings(NOTION_TOKEN='test-token', NOTION_DB_ID='test-db-id')
+    def test_create_qna_page_success(self, mock_post):
+        """노션 페이지 생성 성공시 URL 반환"""
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"url": "https://notion.so/test-page-123"}
+        mock_post.return_value = mock_response
+
+        dto = QnACreateDTO(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            category="테스트 카테고리",
+            ai_answer="테스트 답변",
+            keywords = ["python, Django"],
+            hit_count = 1
+        )
+
+        adapter = NotionAdapter()
+        result = adapter.create_qna_page(dto)
+
+        assert result == "https://notion.so/test-page-123"
+        mock_post.assert_called_once()
+
+    @patch("archiver.adapters.requests.post")
+    @override_settings(NOTION_TOKEN='test-token', NOTION_DB_ID='test-db-id')
+    def test_create_qna_page_api_error(self, mock_post):
+        """노션 API 에러 시 NOtionAPIError 발생"""
+
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        mock_response.json.return_value = {"message": "Invalid request"}
+        mock_post.return_value = mock_response
+
+        dto = QnACreateDTO(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            ai_answer="테스트 답변",
+            category="General",
+            keywords=[],
+            hit_count=1,
+        )
+
+        adapter = NotionAdapter()
+
+        with pytest.raises(NotionAPIError, match="노션 API 에러"):
+            adapter.create_qna_page(dto)
+
+    @patch("archiver.adapters.requests.post")
+    @override_settings(NOTION_TOKEN='test-token', NOTION_DB_ID='test-db-id')
+    def test_create_qna_page_network_error(self, mock_post):
+        """네트워크 오류 시 NotionAPIError 발생"""
+        mock_post.side_effect = requests.exceptions.RequestException("Connection failed")
+
+        dto = QnACreateDTO(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            ai_answer="테스트 답변",
+            category="General",
+            keywords=[],
+            hit_count=1,
+        )
+
+        adapter = NotionAdapter()
+
+        with pytest.raises(NotionAPIError, match="연결 실패"):
+            adapter.create_qna_page(dto)
+
+    @override_settings(NOTION_TOKEN=None, NOTION_DB_ID='tset-db-id')
+    def test_init_without_token_raises_error(self):
+        """NOTION_TOKEN이 없으면 NotionAPIError 발생"""
+        with pytest.raises(NotionAPIError, match="NOTION_TOKEN"):
+            NotionAdapter()
+
+    @override_settings(NOTION_TOKEN='test-token', NOTION_DB_ID=None)
+    def test_init_without_db_id_raises_error(self):
+        """NOTION_DB_ID가 없으면 NotionAPIError 발생"""
+        with pytest.raises(NotionAPIError, match="NOTION_DB_ID"):
+            NotionAdapter()
 
