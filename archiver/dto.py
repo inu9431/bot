@@ -20,6 +20,14 @@ class QnACreateDTO(BaseModel):
     ai_answer: Optional[str] = None
     hit_count: Optional[int] = 1
 
+    @field_validator("keywords", mode='before')
+    @classmethod
+    def split_keywords(cls, v: Any) -> List[str]:
+        if isinstance(v, str):
+            return [item.strip() for item in v.split(',') if item.strip()]
+        if v is None:
+            return []
+        return v
 
 
 class QnAResponseDTO(BaseModel):
@@ -38,10 +46,11 @@ class QnAResponseDTO(BaseModel):
         hit_count: Optional[int] = 1
         created_at: Optional[datetime] = None
 
-        @field_validator("keywords", mode ='before')
+        @field_validator("keywords", mode='before')
         @classmethod
-        def split_keywords(clsl, v:Any) -> Optional[List[str]]:
+        def split_keywords(cls, v: Any) -> List[str]:
             if isinstance(v, str):
                 return [item.strip() for item in v.split(',') if item.strip()]
+            if v is None:
+                return []
             return v
-

@@ -4,8 +4,9 @@ from django.urls import reverse
 from unittest.mock import patch, MagicMock, Mock
 from .services import QnAService
 from .models import QnALog
-from .dto import QnACreateDTO
+from .dto import QnACreateDTO, QnAResponseDTO
 from .tasks import task_process_question
+from .adapters import qna_model_to_create_dto, qna_model_to_response_dto
 from common.exceptions import ValidationError, LLMServiceError, AIResponseParsingError, DatabaseOperationError
 @pytest.fixture
 def qna_bot_api_url():
@@ -267,4 +268,166 @@ class TestTaskProcessQuestion:
 
         mock_logger.info.assert_called_once()
         assert "노션 업로드 완료" in mock_logger.info.call_args[0][0]
+
+class TestQnAModelToCreateDTO:
+    """QnALog -> QnACreateDTO 변환 테스트"""
+
+    def test_converts_qna_Log_to_create_dto(self, db):
+        """QnALog를 QnACreateDTO로 변환"""
+        qna_log = QnALog.objects.create(
+            category="Django",
+            title="Django ORM 질문",
+            question_text = "ORM 사용법이 궁굼합니다",
+            ai_answer = "Django ORM은 ..",
+            keywords = "Django, ORM",
+            hit_count = 3
+        )
+
+        dto = qna_model_to_create_dto(qna_log)
+
+        assert isinstance(dto, QnACreateDTO)
+        assert dto.question_text == "ORM 사용법이 궁굼합니다"
+        assert dto.category == "Django"
+        assert dto.title == "Django ORM 질문"
+        assert dto.ai_answer == "Django ORM은 .."
+        assert dto.keywords ==["Django", "ORM"]
+        assert dto.hit_count == 3
+
+    def test_handles_optional_fields_in_create_dto(self, db):
+        """ 선택적 필드를 처리"""
+        qna_log = QnALog.objects.create(
+            category ="General",
+            title = "최소 정보",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_create_dto(qna_log)
+        assert dto.category == "General"
+        assert dto.title == "최소 정보"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.keywords == [] or dto.keywords is not None
+
+    def test_create_dto_is_immutable(self, db):
+        """CreateDTO는 불변 객체"""
+        qna_log = QnALog.objects.create(
+            title = "테스트",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_create_dto(qna_log)
+
+        with pytest.raises(Exception):
+            dto.title = "변경 시도"
+
+class TestQnAModelToResponseDTO:
+    """QnALog -> QnAResponseDTO 변환 테스트"""
+
+    def test_converts_qna_log_to_response_dto(self, db):
+        """QnALog를 QnAResponseDTO로 변환"""
+        qna_log = QnALog.objects.create(
+            category ="Django",
+            title="테스트 제목",
+            question_text = "질문",
+            ai_answer = "답변",
+            keywords = "Django, ORM, Test",
+            hit_count = 3,
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.category == "Django"
+        assert dto.title == "테스트 제목"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.keywords == ["Django", "ORM", "Test"]
+        assert dto.hit_count == 3
+        assert dto.created_at == qna_log.created_at
+
+    def test_splits_keywords_from_comma_separated_string(self, db):
+        """keywords를 쉼표로 구분한 문자열에서 리스트로 변환한다"""
+        qna_log = QnALog.objects.create(
+            category="General",
+            title="키워드 테스트",
+            question_text="질문",
+            ai_answer="답변",
+            keywords="Python, Django, REST API"
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.keywords == ["Python", "Django", "REST API"]
+
+    def test_handles_empty_keywords(self, db):
+        """keywords가 빈 문자열일뗴 빈 리스트 반환"""
+        qna_log = QnALog.objects.create(
+            category = "General",
+            title = "빈 키워드",
+            question_text = "질문",
+            ai_answer = "답변",
+            keywords = None
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.keywords == [] or dto.keywods is  None
+
+    def test_response_dto_includes_id_and_timestamps(self, db):
+        """ResponseDTO는 id와 created_at을 포함한다"""
+        qna_log = QnALog.objects.create(
+            category = "General",
+            title = "테스트",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        with pytest.raises(Exception):
+            dto.title = "변경 시도"
+
+    def test_handles_all_optional_fields(self, db):
+        """모든 선택적 필드가 있을떄 올바르게 변환"""
+        qna_log = QnALog.objects.create(
+            category="Django",
+            title="테스트",
+            question_text="질문",
+            ai_answer="답변",
+            keywords = "test, example",
+            hit_count = 10,
+            is_verified = True
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.category == "Django"
+        assert dto.title == "테스트"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.keywords == ["test", "example"]
+        assert dto.hit_count == 10
+        assert dto.id > 0
+        assert dto.created_at is not None
+
+    def test_handles_minimal_required_fields(self, db):
+        """최소 필수 필드만으로 변환이 가능하다"""
+        qna_log = QnALog.objects.create(
+            title = "최소 정보",
+            question_text = "질문",
+            ai_answer = "답변"
+        )
+
+        dto = qna_model_to_response_dto(qna_log)
+
+        assert dto.title == "최소 정보"
+        assert dto.question_text == "질문"
+        assert dto.ai_answer == "답변"
+        assert dto.category == "General"
+
+
+
+
+
 
