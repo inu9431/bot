@@ -1,3 +1,5 @@
+from unicodedata import category
+
 import pytest
 import requests
 from django.test import TestCase, override_settings
@@ -270,6 +272,34 @@ class TestTaskProcessQuestion:
 
         mock_logger.info.assert_called_once()
         assert "노션 업로드 완료" in mock_logger.info.call_args[0][0]
+
+class TestTaskProcessQustionFailure:
+    """task_process_question 실패 케이스 테스트"""
+
+    def test_log_not_found_deos_not_raise(self, db):
+        """DOesNotExist는 로깅만 하고 예외를 던지지는 않음"""
+        task_process_question(99999)
+
+    @patch("archiver.tasks.NotionAdapter")
+    def test_notion_failure_raises_exception(self, mock_adapter_class, db):
+        """Notion 업로드 실패시 예외를 던짐"""
+        # Given
+        log = QnALog.objects.create(
+            question_text = "테스트 질문",
+            title = "테스트",
+            ai_answer = "테스트 답변"
+        )
+
+        # When
+        mock_adapter = MagicMock()
+        mock_adapter.create_qna_page.side_effect = Exception("Notion API 실패")
+        mock_adapter_class.return_value = mock_adapter
+
+        # then
+        with pytest.raises(Exception, match="Notion API 실패"):
+            task_process_question(log.id)
+
+
 
 class TestQnAModelToCreateDTO:
     """QnALog -> QnACreateDTO 변환 테스트"""
@@ -596,3 +626,82 @@ class TestNotionAdapter:
         with pytest.raises(NotionAPIError, match="NOTION_DB_ID"):
             NotionAdapter()
 
+
+@pytest.mark.django_db
+class TestProcessQuestionFlowFailure:
+    """process_question_flow 실패 케이스"""
+    def test_database_error_raises_database_operation_error(self, mock_qna_service):
+        """DB 저장 중 예외 발생시 DatabaseOperationError 발생"""
+        # Given
+        mock_dto = MagicMock()
+        mock_dto.title = "테스트 제목"
+        mock_dto.category = "General"
+        mock_dto.keywords = []
+        mock_dto.ai_answer = "테스트 답변"
+        mock_qna_service.gemini.generate_answer.return_value = mock_dto
+
+        # When, Then
+        with patch.object(QnALog.objects, 'create', side_effect=Exception("DB connection failed")):
+            with pytest.raises(DatabaseOperationError, match="데이터베이스"):
+                mock_qna_service.process_question_flow("테스트 질문")
+
+@pytest.mark.djang_db
+class  TestQnALogModel:
+    """QnALog 모델 테스트"""
+
+    @patch("archiver.models.async_task")
+    def test_save_calls_async_task_when_verified_without_notion_url(self, mock_async_task):
+        """is_verified=Ture이고 notion_url이 없으면 async_task 호출"""
+        # Given
+        log = QnALog.objects.create(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            ai_answer="테스트 답변",
+        )
+
+        # When
+        log.is_verified = True
+        log.save()
+
+        # Then
+        mock_async_task.assert_called_once_with(
+            "archiver.tasks.task_process_question",
+            log.id
+        )
+
+    @patch("archiver.models.async_task")
+    def test_save_does_not_call_async_task_when_not_verified(self, mock_async_task):
+        """is_verified=False이면 async_task 호출 안됨"""
+        log = QnALog.objects.create(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            ai_answer="테스트 답변",
+            is_verified = False
+        )
+
+        mock_async_task.assert_not_called()
+
+    @patch("archiver.models.async_task")
+    def test_save_does_not_call_async_task_when_notion_url_exists(self, mock_async_task):
+        """notion_page_url 이 이미 있으면 async_task 호출 안됨"""
+        log = QnALog.objects.create(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            ai_answer="테스트 답변",
+            is_verified=True,
+            notion_page_url="https://notion.so/existing-page"
+        )
+
+        mock_async_task.assert_not_called()
+
+    def test_str_returns_formated_string(self, db):
+        """__str__이 올바른 형식의 문자열 반환"""
+        log = QnALog.objects.create(
+            question_text="테스트 질문",
+            title="테스트 제목",
+            ai_answer="Django ORM 질문",
+            category = "Django",
+            hit_count = 5
+        )
+
+        assert str(log) == "[Django] 테스트 제목 (빈도: 5)"
